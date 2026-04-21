@@ -49,11 +49,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             <SheetContent
               side="left"
-              className="w-60 p-0 bg-sidebar border-r border-sidebar-border"
+              className="w-60! sm:max-w-60! p-0 bg-sidebar border-r border-sidebar-border"
               showCloseButton={false}
             >
-              <SheetTitle className="sr-only">Navegação</SheetTitle>
-              <SheetHeader className="sr-only">Menu de navegação</SheetHeader>
+              <SheetHeader>
+                <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
+              </SheetHeader>
               <SidebarContent onNavigate={() => setMobileOpen(false)} />
             </SheetContent>
           </Sheet>
