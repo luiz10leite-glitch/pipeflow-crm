@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
+    <html lang="pt-BR" className={`${geistSans.variable} ${geistMono.variable} dark h-full`}>
       <body className="min-h-full">
         <TooltipProvider>{children}</TooltipProvider>
       </body>
