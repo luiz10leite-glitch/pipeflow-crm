@@ -72,12 +72,13 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 **Branch:** `milestone/03-auth-ui`
 **Objetivo:** Telas de autenticação com layout consistente, sem lógica real ainda.
 
-- [ ] Criar `app/(auth)/layout.tsx` com layout centrado (logo + card)
-- [ ] Tela `/login`: campos e-mail e senha, botão "Entrar", link "Esqueci a senha", link "Cadastrar"
-- [ ] Tela `/register`: campos nome, e-mail, senha e confirmação, botão "Criar conta", link "Já tenho conta"
-- [ ] Tela `/forgot-password`: campo e-mail, botão "Enviar instruções", mensagem de sucesso
-- [ ] Estados visuais: loading no botão, erro inline nos campos, sucesso
-- [ ] Validação de formulários com `react-hook-form` + `zod`
+- [x] Criar `app/(auth)/layout.tsx` com layout centrado (logo + card)
+- [x] Tela `/login`: campos e-mail e senha, botão "Entrar", link "Esqueci a senha", link "Cadastrar"
+- [x] Tela `/register`: campos nome, e-mail, senha e confirmação, botão "Criar conta", link "Já tenho conta"
+- [x] Tela `/forgot-password`: campo e-mail, botão "Enviar instruções", mensagem de sucesso
+- [x] Estados visuais: loading no botão, erro inline nos campos, sucesso
+- [x] Validação de formulários com `react-hook-form` + `zod`
+- [x] Tela `/onboarding`: nome do workspace, redirect para `/dashboard` (simplificado do M16)
 
 **Commit final:** `feat: auth UI — login, register, forgot-password screens with form validation`
 
