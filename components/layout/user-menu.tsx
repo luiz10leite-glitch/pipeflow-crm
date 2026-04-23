@@ -5,6 +5,7 @@ import { MOCK_USER } from '@/lib/mock-data'
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -34,15 +35,17 @@ export function UserMenu() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="top" align="start" sideOffset={6}>
-        <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-        <DropdownMenuItem>
-          <User className="size-4" />
-          Perfil
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Settings className="size-4" />
-          Configurações
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+          <DropdownMenuItem>
+            <User className="size-4" />
+            Perfil
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Settings className="size-4" />
+            Configurações
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive">
           <LogOut className="size-4" />

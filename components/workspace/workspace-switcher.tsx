@@ -6,6 +6,7 @@ import { MOCK_WORKSPACES, MOCK_ACTIVE_WORKSPACE_ID } from '@/lib/mock-data'
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -34,21 +35,23 @@ export function WorkspaceSwitcher() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="bottom" align="start" sideOffset={6}>
-        <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
-        {MOCK_WORKSPACES.map((ws) => (
-          <DropdownMenuItem key={ws.id} onClick={() => setActiveId(ws.id)}>
-            <span className="flex size-5 shrink-0 items-center justify-center rounded bg-brand-600/20 text-[10px] font-bold text-brand-400">
-              {ws.initials}
-            </span>
-            <span className="flex-1 truncate">{ws.name}</span>
-            {ws.plan === 'pro' && (
-              <span className="rounded-full bg-brand-600/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-400">
-                Pro
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+          {MOCK_WORKSPACES.map((ws) => (
+            <DropdownMenuItem key={ws.id} onClick={() => setActiveId(ws.id)}>
+              <span className="flex size-5 shrink-0 items-center justify-center rounded bg-brand-600/20 text-[10px] font-bold text-brand-400">
+                {ws.initials}
               </span>
-            )}
-            {ws.id === activeId && <Check className="size-3.5 text-brand-500" />}
-          </DropdownMenuItem>
-        ))}
+              <span className="flex-1 truncate">{ws.name}</span>
+              {ws.plan === 'pro' && (
+                <span className="rounded-full bg-brand-600/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-400">
+                  Pro
+                </span>
+              )}
+              {ws.id === activeId && <Check className="size-3.5 text-brand-500" />}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <Plus className="size-4" />
