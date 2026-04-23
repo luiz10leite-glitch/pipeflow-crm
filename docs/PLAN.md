@@ -33,18 +33,18 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 **Branch:** `milestone/01-setup`
 **Objetivo:** Projeto configurado, design system operacional, componentes shadcn instalados.
 
-- [ ] Inicializar Next.js 15 com TypeScript strict (`npx create-next-app@latest`)
-- [ ] Configurar Tailwind CSS v4 e design tokens (cores brand, success, danger, neutral)
-- [ ] Instalar e configurar shadcn/ui (`npx shadcn@latest init`)
-- [ ] Adicionar componentes shadcn base: Button, Input, Card, Badge, Dialog, Sheet, Dropdown, Avatar, Separator, Tabs, Tooltip
-- [ ] Instalar dependências: `@dnd-kit/core @dnd-kit/sortable recharts lucide-react`
-- [ ] Criar estrutura de pastas conforme CLAUDE.md (`app/`, `components/`, `lib/`, `hooks/`, `types/`)
-- [ ] Configurar `lib/utils.ts` com `cn()` helper
-- [ ] Configurar ESLint + Prettier
-- [ ] Criar `.env.local.example` com todas as variáveis necessárias
-- [ ] Confirmar `npm run dev` e `npm run build` sem erros
+- [x] Inicializar Next.js 15 com TypeScript strict (`npx create-next-app@latest`)
+- [x] Configurar Tailwind CSS v4 e design tokens (cores brand, success, danger, neutral)
+- [x] Instalar e configurar shadcn/ui (`npx shadcn@latest init`)
+- [x] Adicionar componentes shadcn base: Button, Input, Card, Badge, Dialog, Sheet, Dropdown, Avatar, Separator, Tabs, Tooltip
+- [x] Instalar dependências: `@dnd-kit/core @dnd-kit/sortable recharts lucide-react`
+- [x] Criar estrutura de pastas conforme CLAUDE.md (`app/`, `components/`, `lib/`, `hooks/`, `types/`)
+- [x] Configurar `lib/utils.ts` com `cn()` helper
+- [x] Configurar ESLint + Prettier
+- [x] Criar `.env.local.example` com todas as variáveis necessárias
+- [x] Confirmar `npm run dev` e `npm run build` sem erros
 
-**Commit final:** `feat: project setup — Next.js 15, Tailwind v4, shadcn/ui, folder structure`
+**Commit final:** `feat: project setup — Next.js 16, Tailwind v4, shadcn/ui, folder structure`
 
 ---
 
@@ -88,14 +88,14 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 **Branch:** `milestone/04-app-shell`
 **Objetivo:** Layout do app autenticado navegável com dados mockados.
 
-- [ ] Criar `app/(app)/layout.tsx` com sidebar fixa + área de conteúdo
-- [ ] Componente `Sidebar` com navegação: Dashboard, Leads, Pipeline, Configurações
-- [ ] Componente `WorkspaceSwitcher` no topo da sidebar (workspaces mockados)
-- [ ] Componente `UserMenu` com avatar, nome e opção de logout
-- [ ] Header com breadcrumb e nome da página atual
-- [ ] Rota `/dashboard` como página inicial do app (placeholder)
-- [ ] Middleware de proteção de rota (redireciona `/` → `/dashboard` se autenticado, `/(app)/*` → `/login` se não)
-- [ ] Responsivo: sidebar colapsável em mobile (Sheet do shadcn)
+- [x] Criar `app/(app)/layout.tsx` com sidebar fixa + área de conteúdo
+- [x] Componente `Sidebar` com navegação: Dashboard, Leads, Pipeline, Configurações
+- [x] Componente `WorkspaceSwitcher` no topo da sidebar (workspaces mockados)
+- [x] Componente `UserMenu` com avatar, nome e opção de logout
+- [x] Header com breadcrumb e nome da página atual
+- [x] Rota `/dashboard` como página inicial do app (placeholder)
+- [x] Middleware de proteção de rota (redireciona `/` → `/dashboard` se autenticado, `/(app)/*` → `/login` se não)
+- [x] Responsivo: sidebar colapsável em mobile (Sheet do shadcn)
 
 **Commit final:** `feat: app shell — sidebar, workspace switcher, user menu, route protection`
 
