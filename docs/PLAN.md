@@ -188,7 +188,7 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 - [ ] Política: usuário só acessa dados do workspace onde é membro
 - [ ] Migration `003_indexes`: índices em `workspace_id`, `lead_id`, `owner_id`, `stage`
 - [ ] Gerar tipos TypeScript com `supabase gen types typescript` → `types/database.ts`
-- [ ] Configurar `lib/supabase/server.ts` e `lib/supabase/client.ts`
+- [x] Configurar `lib/supabase/server.ts` e `lib/supabase/client.ts`
 - [ ] Testar políticas RLS manualmente no Supabase Studio
 - [ ] Documentar modelo de dados em `supabase/migrations/README.md`
 
