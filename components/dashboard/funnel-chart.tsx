@@ -36,6 +36,31 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   )
 }
 
+// SVG fill attributes don't resolve CSS custom properties — use a React component
+// so Tailwind classes are applied via the CSS cascade instead.
+interface AxisTickProps {
+  x?: number
+  y?: number
+  payload?: { value: string }
+}
+
+function CustomAxisTick({ x = 0, y = 0, payload }: AxisTickProps) {
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={4}
+        textAnchor="end"
+        fontSize={12}
+        className="fill-foreground/60"
+      >
+        {payload?.value}
+      </text>
+    </g>
+  )
+}
+
 export function FunnelChart({ data }: FunnelChartProps) {
   return (
     <Card className="flex flex-col">
@@ -55,7 +80,7 @@ export function FunnelChart({ data }: FunnelChartProps) {
               type="category"
               dataKey="label"
               width={110}
-              tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+              tick={<CustomAxisTick />}
               axisLine={false}
               tickLine={false}
             />
