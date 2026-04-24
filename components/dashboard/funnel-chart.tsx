@@ -36,15 +36,40 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   )
 }
 
-// SVG fill attributes don't resolve CSS custom properties — use a React component
-// so Tailwind classes are applied via the CSS cascade instead.
-interface AxisTickProps {
+// SVG fill attributes don't resolve CSS custom properties via cascade — use a
+// React component so Tailwind classes are applied through the CSS cascade.
+interface XAxisTickProps {
   x?: number
   y?: number
   payload?: { value: string }
 }
 
-function CustomAxisTick({ x = 0, y = 0, payload }: AxisTickProps) {
+function CustomXAxisTick({ x = 0, y = 0, payload }: XAxisTickProps) {
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={4}
+        dx={-4}
+        textAnchor="end"
+        fontSize={11}
+        transform="rotate(-35)"
+        className="fill-foreground/60"
+      >
+        {payload?.value}
+      </text>
+    </g>
+  )
+}
+
+interface YAxisTickProps {
+  x?: number
+  y?: number
+  payload?: { value: number }
+}
+
+function CustomYAxisTick({ x = 0, y = 0, payload }: YAxisTickProps) {
   return (
     <g transform={`translate(${x},${y})`}>
       <text
@@ -52,7 +77,7 @@ function CustomAxisTick({ x = 0, y = 0, payload }: AxisTickProps) {
         y={0}
         dy={4}
         textAnchor="end"
-        fontSize={12}
+        fontSize={11}
         className="fill-foreground/60"
       >
         {payload?.value}
@@ -65,27 +90,30 @@ export function FunnelChart({ data }: FunnelChartProps) {
   return (
     <Card className="flex flex-col">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Funil por Etapa</CardTitle>
+        <CardTitle className="text-base font-semibold">Negócios por Etapa</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pt-0">
-        <ResponsiveContainer width="100%" height={260}>
+        <ResponsiveContainer width="100%" height={300}>
           <BarChart
             data={data}
-            layout="vertical"
-            margin={{ top: 0, right: 16, left: 0, bottom: 0 }}
-            barSize={28}
+            margin={{ top: 8, right: 8, left: -16, bottom: 56 }}
+            barSize={40}
           >
-            <XAxis type="number" hide />
-            <YAxis
-              type="category"
+            <XAxis
               dataKey="label"
-              width={110}
-              tick={<CustomAxisTick />}
+              tick={<CustomXAxisTick />}
+              axisLine={false}
+              tickLine={false}
+              interval={0}
+            />
+            <YAxis
+              allowDecimals={false}
+              tick={<CustomYAxisTick />}
               axisLine={false}
               tickLine={false}
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted))', radius: 4 }} />
-            <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
               {data.map((entry) => (
                 <Cell key={entry.stage} fill={entry.fill} />
               ))}

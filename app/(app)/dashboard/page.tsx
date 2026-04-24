@@ -2,13 +2,22 @@ import { Users, Briefcase, DollarSign, TrendingUp } from 'lucide-react'
 import { MetricCard } from '@/components/dashboard/metric-card'
 import { FunnelChart } from '@/components/dashboard/funnel-chart'
 import { DealsTable } from '@/components/dashboard/deals-table'
-import { MOCK_LEADS, MOCK_DEALS, STAGE_CONFIG } from '@/lib/mock-data'
+import { MOCK_LEADS, MOCK_DEALS } from '@/lib/mock-data'
 import type { DealStage } from '@/types/pipeline'
 
-// Stage order for the funnel (excluding closed)
-const FUNNEL_STAGES: DealStage[] = ['new_lead', 'contacted', 'proposal_sent', 'negotiation']
+const FUNNEL_STAGES: DealStage[] = [
+  'new_lead', 'contacted', 'proposal_sent', 'negotiation', 'closed_won', 'closed_lost',
+]
 
-// Bar fill colours that complement the existing palette
+const STAGE_LABELS_PT: Record<DealStage, string> = {
+  new_lead:      'Novo Lead',
+  contacted:     'Contato Realizado',
+  proposal_sent: 'Proposta Enviada',
+  negotiation:   'Negociação',
+  closed_won:    'Fechado Ganho',
+  closed_lost:   'Fechado Perdido',
+}
+
 const STAGE_FILLS: Record<DealStage, string> = {
   new_lead:      '#3B82F6',
   contacted:     '#06B6D4',
@@ -52,7 +61,7 @@ export default function DashboardPage() {
     const stageDeals = MOCK_DEALS.filter((d) => d.stage === stage)
     return {
       stage,
-      label: STAGE_CONFIG[stage].label,
+      label: STAGE_LABELS_PT[stage],
       count: stageDeals.length,
       value: stageDeals.reduce((s, d) => s + d.value, 0),
       fill: STAGE_FILLS[stage],
