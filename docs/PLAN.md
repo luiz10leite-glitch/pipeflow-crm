@@ -130,15 +130,15 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 **Branch:** `milestone/06-pipeline-ui`
 **Objetivo:** Kanban funcional com drag-and-drop, dados mockados.
 
-- [ ] Página `/pipeline` com `KanbanBoard`
-- [ ] Componente `KanbanBoard`: container com `DndContext` do @dnd-kit
-- [ ] Componente `KanbanColumn`: coluna por estágio com header (nome + contagem + valor total)
-- [ ] Componente `DealCard`: cartão com título, valor (R$), lead vinculado, responsável (avatar), prazo e badge de urgência
-- [ ] Drag-and-drop funcional entre colunas (somente visual, sem persistência ainda)
-- [ ] Botão "Novo Deal" em cada coluna → `DealForm` em Dialog (título, valor, lead, responsável, prazo)
-- [ ] Clicar no `DealCard` abre Sheet lateral com detalhe do deal
-- [ ] Os 6 estágios do pipeline presentes e ordenados
-- [ ] Scroll horizontal quando colunas excedem a tela
+- [x] Página `/pipeline` com `KanbanBoard`
+- [x] Componente `KanbanBoard`: container com `DndContext` do @dnd-kit
+- [x] Componente `KanbanColumn`: coluna por estágio com header (nome + contagem + valor total)
+- [x] Componente `DealCard`: cartão com título, valor (R$), lead vinculado, responsável (avatar), prazo e badge de urgência
+- [x] Drag-and-drop funcional entre colunas (somente visual, sem persistência ainda)
+- [x] Botão "Novo Deal" em cada coluna → `DealForm` em Dialog (título, valor, lead, responsável, prazo)
+- [x] Clicar no `DealCard` abre Sheet lateral com detalhe do deal
+- [x] Os 6 estágios do pipeline presentes e ordenados
+- [x] Scroll horizontal quando colunas excedem a tela
 
 **Commit final:** `feat: pipeline UI — kanban board, drag-and-drop, deal card, deal form (mock data)`
 
