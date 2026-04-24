@@ -181,16 +181,16 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 **Branch:** `milestone/09-database`
 **Objetivo:** Schema Supabase completo com RLS e tipos TypeScript gerados.
 
-- [ ] Criar projeto Supabase (local via CLI + remoto)
-- [ ] Migration `001_initial_schema`: tabelas `workspaces`, `workspace_members`, `leads`, `deals`, `activities`, `invites`
-- [ ] Adicionar campos: `created_at`, `updated_at` em todas as tabelas
-- [ ] Migration `002_rls_policies`: habilitar RLS em todas as tabelas + políticas por `workspace_id`
-- [ ] Política: usuário só acessa dados do workspace onde é membro
-- [ ] Migration `003_indexes`: índices em `workspace_id`, `lead_id`, `owner_id`, `stage`
-- [ ] Gerar tipos TypeScript com `supabase gen types typescript` → `types/database.ts`
+- [x] Criar projeto Supabase (local via CLI + remoto)
+- [x] Migration `001_initial_schema`: tabelas `workspaces`, `workspace_members`, `leads`, `deals`, `activities`, `invites`
+- [x] Adicionar campos: `created_at`, `updated_at` em todas as tabelas
+- [x] Migration `002_rls_policies`: habilitar RLS em todas as tabelas + políticas por `workspace_id`
+- [x] Política: usuário só acessa dados do workspace onde é membro
+- [x] Migration `003_indexes`: índices em `workspace_id`, `lead_id`, `owner_id`, `stage`
+- [x] Gerar tipos TypeScript com `supabase gen types typescript` → `types/database.ts`
 - [x] Configurar `lib/supabase/server.ts` e `lib/supabase/client.ts`
-- [ ] Testar políticas RLS manualmente no Supabase Studio
-- [ ] Documentar modelo de dados em `supabase/migrations/README.md`
+- [x] Testar políticas RLS manualmente no Supabase Studio
+- [x] Documentar modelo de dados em `supabase/migrations/README.md`
 
 **Commit final:** `feat: database schema — migrations, RLS policies, indexes, TypeScript types`
 
