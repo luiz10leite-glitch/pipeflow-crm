@@ -107,19 +107,19 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 **Branch:** `milestone/05-leads-ui`
 **Objetivo:** Módulo de leads completo com dados mockados, navegável end-to-end.
 
-- [ ] Página `/leads`: tabela com colunas (Nome, Empresa, Status, Responsável, Data)
-- [ ] Componente `LeadCard` para visualização em grid (alternativa à tabela)
-- [ ] Barra de busca por nome/empresa
-- [ ] Filtros: status, responsável, período
-- [ ] Botão "Novo Lead" → `LeadForm` em Dialog (campos: nome, e-mail, telefone, empresa, cargo, status)
-- [ ] Ação de editar lead (mesmo form em modo edição)
-- [ ] Ação de deletar lead com confirmação
-- [ ] Página `/leads/[id]`: perfil completo do lead (header com dados + tabs)
-- [ ] Tab **Visão Geral**: dados do lead em cards
-- [ ] Tab **Atividades**: timeline cronológica com `ActivityTimeline`
-- [ ] Componente `ActivityTimeline`: lista de atividades com ícone por tipo (ligação, e-mail, reunião, nota)
+- [x] Página `/leads`: tabela com colunas (Nome, Empresa, Status, Responsável, Data)
+- [x] Componente `LeadCard` para visualização em grid (alternativa à tabela)
+- [x] Barra de busca por nome/empresa
+- [x] Filtros: status (responsável e período ficam para M11 com dados reais)
+- [x] Botão "Novo Lead" → `LeadForm` em Dialog (campos: nome, e-mail, telefone, empresa, cargo, status)
+- [x] Ação de editar lead (mesmo form em modo edição)
+- [x] Ação de deletar lead com confirmação
+- [x] Página `/leads/[id]`: perfil completo do lead (header com dados + tabs)
+- [x] Tab **Visão Geral**: dados do lead em cards
+- [x] Tab **Atividades**: timeline cronológica com `ActivityTimeline`
+- [x] Componente `ActivityTimeline`: lista de atividades com ícone por tipo (ligação, e-mail, reunião, nota)
 - [ ] Formulário inline para registrar nova atividade (tipo, descrição)
-- [ ] Dados mockados via `lib/mock-data.ts`
+- [x] Dados mockados via `lib/mock-data.ts`
 
 **Commit final:** `feat: leads UI — list, filters, lead form, detail page, activity timeline (mock data)`
 
