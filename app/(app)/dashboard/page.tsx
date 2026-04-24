@@ -115,7 +115,7 @@ export default function DashboardPage() {
       {/* Funnel + Upcoming deals */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <FunnelChart data={funnelData} />
-        <DealsTable deals={upcomingDeals} />
+        <DealsTable deals={upcomingDeals} today={today} />
       </div>
     </div>
   )

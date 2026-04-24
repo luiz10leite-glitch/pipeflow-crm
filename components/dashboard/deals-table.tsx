@@ -12,6 +12,7 @@ import type { Deal } from '@/types/pipeline'
 
 interface DealsTableProps {
   deals: Deal[]
+  today: Date
 }
 
 function formatBRL(value: number) {
@@ -32,10 +33,7 @@ function urgencyBadge(dueDate: string, today: Date) {
   return <Badge variant="secondary">Em {diffDays}d</Badge>
 }
 
-export function DealsTable({ deals }: DealsTableProps) {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
+export function DealsTable({ deals, today }: DealsTableProps) {
   return (
     <Card className="flex flex-col">
       <CardHeader className="pb-2">
