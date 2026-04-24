@@ -1,4 +1,5 @@
 import type { Lead } from '@/types/lead'
+import type { Deal, DealStage, StageConfig } from '@/types/pipeline'
 
 export const MOCK_USER = {
   name: 'Lucas Mendes',
@@ -234,4 +235,38 @@ export const MOCK_LEADS: Lead[] = [
     createdAt: '2026-04-20',
     activities: [],
   },
+]
+
+export const STAGE_CONFIG: Record<DealStage, StageConfig> = {
+  new_lead:      { id: 'new_lead',      label: 'New Lead',      color: 'bg-blue-500/15',   textColor: 'text-blue-400',   borderColor: 'border-blue-500/30',   shadowColor: '#3B82F6' },
+  contacted:     { id: 'contacted',     label: 'Contacted',     color: 'bg-cyan-500/15',   textColor: 'text-cyan-400',   borderColor: 'border-cyan-500/30',   shadowColor: '#06B6D4' },
+  proposal_sent: { id: 'proposal_sent', label: 'Proposal Sent', color: 'bg-amber-500/15',  textColor: 'text-amber-400',  borderColor: 'border-amber-500/30',  shadowColor: '#F59E0B' },
+  negotiation:   { id: 'negotiation',   label: 'Negotiation',   color: 'bg-orange-500/15', textColor: 'text-orange-400', borderColor: 'border-orange-500/30', shadowColor: '#F97316' },
+  closed_won:    { id: 'closed_won',    label: 'Closed Won',    color: 'bg-green-500/15',  textColor: 'text-green-400',  borderColor: 'border-green-500/30',  shadowColor: '#22C55E' },
+  closed_lost:   { id: 'closed_lost',   label: 'Closed Lost',   color: 'bg-red-500/15',    textColor: 'text-red-400',    borderColor: 'border-red-500/30',    shadowColor: '#EF4444' },
+}
+
+export const PIPELINE_STAGES: DealStage[] = [
+  'new_lead', 'contacted', 'proposal_sent', 'negotiation', 'closed_won', 'closed_lost',
+]
+
+export const MOCK_DEALS: Deal[] = [
+  { id: 'd1',  title: 'Plano Pro — Ferreira Advocacia',      value: 5880,  stage: 'new_lead',      leadId: '1',  leadName: 'Ana Claudia Ferreira',  responsible: 'Lucas Mendes', dueDate: '2026-05-10', createdAt: '2026-04-15' },
+  { id: 'd2',  title: 'Licença Anual — Grupo Oliveira',      value: 14112, stage: 'new_lead',      leadId: '2',  leadName: 'Marcos Aurelio Oliveira', responsible: 'Lucas Mendes', dueDate: '2026-05-20', createdAt: '2026-04-16' },
+  { id: 'd3',  title: 'Onboarding Premium — Costa Digital',  value: 2940,  stage: 'new_lead',      leadId: '9',  leadName: 'Juliana Costa',         responsible: 'Lucas Mendes', dueDate: null,         createdAt: '2026-04-18' },
+  { id: 'd4',  title: 'Plano Pro — Ribeiro Idiomas',         value: 5880,  stage: 'new_lead',      leadId: '15', leadName: 'Natalia Ribeiro',       responsible: 'Lucas Mendes', dueDate: '2026-05-30', createdAt: '2026-04-20' },
+  { id: 'd5',  title: 'Demo → Proposta — Alves Construtora', value: 8820,  stage: 'contacted',     leadId: '6',  leadName: 'Diego Alves',           responsible: 'Lucas Mendes', dueDate: '2026-04-28', createdAt: '2026-04-10' },
+  { id: 'd6',  title: 'Módulo Pipeline — Pereira Clínica',   value: 3528,  stage: 'contacted',     leadId: '11', leadName: 'Larissa Pereira',       responsible: 'Lucas Mendes', dueDate: '2026-04-25', createdAt: '2026-04-12' },
+  { id: 'd7',  title: 'Plano Pro Mensal — Lima Arquitetura', value: 588,   stage: 'contacted',     leadId: '5',  leadName: 'Fernanda Lima',         responsible: 'Lucas Mendes', dueDate: null,         createdAt: '2026-04-14' },
+  { id: 'd8',  title: 'Proposta Customizada — Souza & Irmãos', value: 17640, stage: 'proposal_sent', leadId: '3',  leadName: 'Patricia Souza',        responsible: 'Lucas Mendes', dueDate: '2026-04-26', createdAt: '2026-04-05' },
+  { id: 'd9',  title: 'API Enterprise — Martins Indústria',  value: 23520, stage: 'proposal_sent', leadId: '10', leadName: 'Eduardo Martins',       responsible: 'Lucas Mendes', dueDate: '2026-05-05', createdAt: '2026-04-08' },
+  { id: 'd10', title: 'Plano Pro — Gonçalves Turismo',       value: 7056,  stage: 'proposal_sent', leadId: '13', leadName: 'Isabela Gonçalves',     responsible: 'Lucas Mendes', dueDate: '2026-05-02', createdAt: '2026-04-11' },
+  { id: 'd11', title: 'Contrato Bianual — Barbosa Tecnologia', value: 47040, stage: 'negotiation',   leadId: '14', leadName: 'Raphael Barbosa',       responsible: 'Lucas Mendes', dueDate: '2026-04-24', createdAt: '2026-03-20' },
+  { id: 'd12', title: 'Time 10 Usuários — Souza Consultoria', value: 29400, stage: 'negotiation',   leadId: '3',  leadName: 'Patricia Souza',        responsible: 'Lucas Mendes', dueDate: '2026-04-30', createdAt: '2026-03-25' },
+  { id: 'd13', title: 'Expansão — Rocha Eventos',             value: 11760, stage: 'negotiation',   leadId: '7',  leadName: 'Camila Rocha',          responsible: 'Lucas Mendes', dueDate: '2026-05-08', createdAt: '2026-04-01' },
+  { id: 'd14', title: 'Plano Pro Anual — Tech Solutions',     value: 14112, stage: 'closed_won',    leadId: '4',  leadName: 'Roberto Cardoso',       responsible: 'Lucas Mendes', dueDate: null,         createdAt: '2026-02-25' },
+  { id: 'd15', title: 'Pro Anual + Indicação — Santos Dist.', value: 12700, stage: 'closed_won',    leadId: '12', leadName: 'Bruno Santos',          responsible: 'Lucas Mendes', dueDate: null,         createdAt: '2026-02-20' },
+  { id: 'd16', title: 'Starter Anual — Gonçalves Turismo',   value: 5880,  stage: 'closed_won',    leadId: '13', leadName: 'Isabela Gonçalves',     responsible: 'Lucas Mendes', dueDate: null,         createdAt: '2026-03-15' },
+  { id: 'd17', title: 'Sem Budget Q1 — Nascimento Logística', value: 8820,  stage: 'closed_lost',   leadId: '8',  leadName: 'Thiago Nascimento',     responsible: 'Lucas Mendes', dueDate: null,         createdAt: '2026-02-15' },
+  { id: 'd18', title: 'Concorrente — Empresa XYZ',            value: 5880,  stage: 'closed_lost',   leadId: '6',  leadName: 'Diego Alves',           responsible: 'Lucas Mendes', dueDate: null,         createdAt: '2026-03-01' },
 ]
