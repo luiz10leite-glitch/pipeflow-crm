@@ -53,15 +53,15 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 **Branch:** `milestone/02-landing`
 **Objetivo:** Página pública `/` completa e responsiva, pronta para apresentar o produto.
 
-- [ ] Criar `app/(marketing)/page.tsx` com layout público
-- [ ] Seção **Hero**: headline, subheadline, CTA "Começar grátis" e "Ver demo"
-- [ ] Seção **Features**: 6 cards com ícone, título e descrição (Pipeline Kanban, Multiempresa, Dashboard, Atividades, Plano Free, Segurança)
-- [ ] Seção **Pricing**: 2 cards (Free e Pro R$ 49/mês) com lista de benefícios e botão de upgrade
-- [ ] Seção **CTA final**: banner com chamada de ação + botão
-- [ ] Header público com logo + links de navegação + botão Login
-- [ ] Footer com links institucionais
-- [ ] Responsivo: mobile, tablet e desktop
-- [ ] Verificar Lighthouse score (Performance, Acessibilidade)
+- [x] Criar `app/(marketing)/page.tsx` com layout público
+- [x] Seção **Hero**: headline, subheadline, CTA "Começar grátis" e "Ver demo"
+- [x] Seção **Features**: 6 cards com ícone, título e descrição (Pipeline Kanban, Multiempresa, Dashboard, Atividades, Plano Free, Segurança)
+- [x] Seção **Pricing**: 2 cards (Free e Pro R$ 49/mês) com lista de benefícios e botão de upgrade
+- [x] Seção **CTA final**: banner com chamada de ação + botão
+- [x] Header público com logo + links de navegação + botão Login
+- [x] Footer com links institucionais
+- [x] Responsivo: mobile, tablet e desktop
+- [x] Verificar Lighthouse score (Performance, Acessibilidade)
 
 **Commit final:** `feat: landing page — hero, features, pricing, CTA, responsive`
 
@@ -149,12 +149,12 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 **Branch:** `milestone/07-dashboard-ui`
 **Objetivo:** Painel de métricas com componentes de dados mockados.
 
-- [ ] Página `/dashboard` com grid de cards e gráficos
-- [ ] Componente `MetricCard`: ícone, label, valor e variação percentual (ex: +12% vs mês anterior)
-- [ ] 4 cards: Total de Leads, Deals Abertos, Valor do Pipeline (R$), Taxa de Conversão (%)
-- [ ] Componente `FunnelChart` com Recharts: barras horizontais por estágio do pipeline
-- [ ] Tabela `DealsTable`: deals com prazo próximo (próximos 7 dias) com colunas título, lead, valor, prazo
-- [ ] Layout responsivo: 2 colunas em desktop, 1 em mobile
+- [x] Página `/dashboard` com grid de cards e gráficos
+- [x] Componente `MetricCard`: ícone, label, valor e variação percentual (ex: +12% vs mês anterior)
+- [x] 4 cards: Total de Leads, Deals Abertos, Valor do Pipeline (R$), Taxa de Conversão (%)
+- [x] Componente `FunnelChart` com Recharts: barras horizontais por estágio do pipeline
+- [x] Tabela `DealsTable`: deals com prazo próximo (próximos 7 dias) com colunas título, lead, valor, prazo
+- [x] Layout responsivo: 2 colunas em desktop, 1 em mobile
 
 **Commit final:** `feat: dashboard UI — metric cards, funnel chart, upcoming deals table (mock data)`
 
