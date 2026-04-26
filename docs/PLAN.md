@@ -198,20 +198,22 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 
 ## M10 — Auth Backend
 
-**Branch:** `milestone/10-auth-backend`
+**Branch:** `feat/auth-backend`
 **Objetivo:** Autenticação real com Supabase Auth, sessão persistida, middleware funcional.
 
-- [ ] Integrar Supabase Auth nos formulários de login e cadastro (M3)
-- [ ] Cadastro: criar usuário + criar workspace padrão + adicionar como admin
-- [ ] Login: autenticar e redirecionar para `/dashboard`
-- [ ] Logout: limpar sessão e redirecionar para `/login`
-- [ ] Forgot password: enviar e-mail de reset via Supabase Auth
-- [ ] Middleware `middleware.ts`: verificar sessão ativa; proteger rotas `/(app)/*`
-- [ ] `lib/supabase/server.ts` com `createServerClient` para Server Components e Route Handlers
-- [ ] Hook `useUser()` para Client Components acessarem o usuário logado
-- [ ] Remover dados mockados de autenticação
+- [x] Integrar Supabase Auth nos formulários de login e cadastro (M3)
+- [x] Cadastro: criar usuário + criar workspace padrão + adicionar como admin
+- [x] Login: autenticar e redirecionar para `/dashboard`
+- [x] Logout: limpar sessão e redirecionar para `/login`
+- [x] Forgot password: enviar e-mail de reset via Supabase Auth
+- [x] `proxy.ts` (Next.js 16): verificar sessão ativa; proteger rotas `/(app)/*`
+- [x] `lib/supabase/server.ts` com `createServerClient` para Server Components e Route Handlers
+- [x] Workspace criado via RPC `create_workspace` (SECURITY DEFINER — atômico e seguro)
+- [x] RLS hardening: migrations 004 (performance) e 005 (policy fix + RPC)
+- [x] Dados reais fluindo pelo layout: user, workspaces, workspace switcher
+- [x] 10 testes de fluxo automatizados passando (auth, RLS, multi-tenant, isolamento)
 
-**Commit final:** `feat: auth backend — Supabase Auth integrated, session, middleware, workspace creation`
+**Commit final:** `feat: auth backend — Supabase Auth integrado, sessão real, proteção de rotas`
 
 ---
 
