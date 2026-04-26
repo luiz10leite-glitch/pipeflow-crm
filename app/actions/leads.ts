@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import type { LeadStatus } from '@/types/supabase'
 
 type Client = Awaited<ReturnType<typeof getSupabaseServerClient>>

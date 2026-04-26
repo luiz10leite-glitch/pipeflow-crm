@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useTransition } from 'react'
+import { useState, useCallback, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   DndContext,
@@ -55,6 +55,11 @@ export function KanbanBoard({ initialDeals, leads, userName }: KanbanBoardProps)
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
+
+  // Sincroniza estado local quando o Server Component re-renderiza com dados frescos
+  useEffect(() => {
+    setDeals(initialDeals)
+  }, [initialDeals])
 
   const activeDeals = deals.filter(d => d.stage !== 'closed_won' && d.stage !== 'closed_lost')
   const totalPipelineValue = activeDeals.reduce((s, d) => s + d.value, 0)
