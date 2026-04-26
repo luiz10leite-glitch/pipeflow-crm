@@ -1,16 +1,12 @@
 import { redirect } from 'next/navigation'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
+import { getActiveWorkspace } from '@/lib/workspace'
 import { LeadsClient } from '@/components/leads/leads-client'
 
 export default async function LeadsPage() {
   const supabase = await getSupabaseServerClient()
 
-  const { data: workspace } = await supabase
-    .from('workspaces')
-    .select('id')
-    .limit(1)
-    .single()
-
+  const workspace = await getActiveWorkspace(supabase)
   if (!workspace) redirect('/onboarding')
 
   const { data: leads } = await supabase

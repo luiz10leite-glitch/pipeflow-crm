@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
+import { getActiveWorkspaceId } from '@/lib/workspace'
 import { AppShell } from '@/components/layout/app-shell'
 import type { WorkspaceInfo } from '@/components/workspace/workspace-switcher'
 
@@ -21,6 +22,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (typedWorkspaces.length === 0) redirect('/onboarding')
 
+  const activeWorkspaceId = await getActiveWorkspaceId(typedWorkspaces.map((w) => w.id))
+
   const fullName = (user.user_metadata?.full_name as string | undefined) ?? ''
   const displayName = fullName || (user.email?.split('@')[0] ?? 'Usuário')
   const initials = fullName
@@ -36,6 +39,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <AppShell
       user={{ name: displayName, email: user.email ?? '', initials }}
       workspaces={typedWorkspaces}
+      activeWorkspaceId={activeWorkspaceId}
     >
       {children}
     </AppShell>

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { Users, Briefcase, DollarSign, TrendingUp } from 'lucide-react'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
+import { getActiveWorkspace } from '@/lib/workspace'
 import { MetricCard } from '@/components/dashboard/metric-card'
 import { FunnelChart } from '@/components/dashboard/funnel-chart'
 import { DealsTable } from '@/components/dashboard/deals-table'
@@ -31,12 +32,7 @@ function formatPercent(value: number) {
 export default async function DashboardPage() {
   const supabase = await getSupabaseServerClient()
 
-  const { data: workspace } = await supabase
-    .from('workspaces')
-    .select('id')
-    .limit(1)
-    .single()
-
+  const workspace = await getActiveWorkspace(supabase)
   if (!workspace) redirect('/onboarding')
 
   const [leadsResult, dealsResult] = await Promise.all([
