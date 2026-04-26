@@ -19,7 +19,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>
 
-export function LoginForm() {
+export function LoginForm({ next }: { next?: string }) {
   const router = useRouter()
   const [serverError, setServerError] = useState<string | null>(null)
 
@@ -44,7 +44,8 @@ export function LoginForm() {
       )
       return
     }
-    router.push('/dashboard')
+    const destination = next && next.startsWith('/') ? next : '/dashboard'
+    router.push(destination)
     router.refresh()
   }
 

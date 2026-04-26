@@ -213,6 +213,61 @@ export interface Database {
           accepted_at?: string | null
         }
       }
+      // -----------------------------------------------------------------------
+      workspace_invites: {
+        Relationships: []
+        Row: {
+          id:           string
+          workspace_id: string
+          email:        string
+          role:         MemberRole
+          invited_by:   string | null
+          token:        string
+          expires_at:   string
+          accepted_at:  string | null
+          created_at:   string
+        }
+        Insert: {
+          id?:          string
+          workspace_id: string
+          email:        string
+          role?:        MemberRole
+          invited_by?:  string | null
+          token?:       string
+          expires_at?:  string
+          accepted_at?: string | null
+          created_at?:  string
+        }
+        Update: {
+          role?:        MemberRole
+          token?:       string
+          expires_at?:  string
+          accepted_at?: string | null
+        }
+      }
+      // -----------------------------------------------------------------------
+      profiles: {
+        Relationships: []
+        Row: {
+          id:         string
+          email:      string
+          full_name:  string
+          avatar_url: string | null
+          created_at: string
+        }
+        Insert: {
+          id:          string
+          email:       string
+          full_name?:  string
+          avatar_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          email?:      string
+          full_name?:  string
+          avatar_url?: string | null
+        }
+      }
     }
     Views:   Record<string, never>
     Functions: {
@@ -226,6 +281,22 @@ export interface Database {
       }
       create_workspace: {
         Args:    { p_name: string; p_slug: string }
+        Returns: string
+      }
+      get_workspace_invite: {
+        Args:    { p_token: string }
+        Returns: {
+          id:             string
+          workspace_id:   string
+          workspace_name: string
+          email:          string
+          role:           string
+          expires_at:     string
+          accepted_at:    string | null
+        }[]
+      }
+      accept_workspace_invite: {
+        Args:    { p_token: string }
         Returns: string
       }
     }
@@ -247,6 +318,8 @@ export type Lead             = Tables<'leads'>
 export type Deal             = Tables<'deals'>
 export type Activity         = Tables<'activities'>
 export type Invite           = Tables<'invites'>
+export type WorkspaceInvite  = Tables<'workspace_invites'>
+export type Profile          = Tables<'profiles'>
 
 type InsertOf<T extends keyof Database['public']['Tables']> =
   Database['public']['Tables'][T]['Insert']
@@ -257,6 +330,7 @@ export type LeadInsert            = InsertOf<'leads'>
 export type DealInsert            = InsertOf<'deals'>
 export type ActivityInsert        = InsertOf<'activities'>
 export type InviteInsert          = InsertOf<'invites'>
+export type WorkspaceInviteInsert = InsertOf<'workspace_invites'>
 
 type UpdateOf<T extends keyof Database['public']['Tables']> =
   Database['public']['Tables'][T]['Update']
@@ -266,3 +340,4 @@ export type WorkspaceMemberUpdate = UpdateOf<'workspace_members'>
 export type LeadUpdate            = UpdateOf<'leads'>
 export type DealUpdate            = UpdateOf<'deals'>
 export type InviteUpdate          = UpdateOf<'invites'>
+export type WorkspaceInviteUpdate = UpdateOf<'workspace_invites'>

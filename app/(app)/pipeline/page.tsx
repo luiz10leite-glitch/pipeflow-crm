@@ -1,17 +1,13 @@
 import { redirect } from 'next/navigation'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
+import { getActiveWorkspace } from '@/lib/workspace'
 import { KanbanBoard } from '@/components/pipeline/kanban-board'
 import type { DealWithLead } from '@/types/pipeline'
 
 export default async function PipelinePage() {
   const supabase = await getSupabaseServerClient()
 
-  const { data: workspace } = await supabase
-    .from('workspaces')
-    .select('id')
-    .limit(1)
-    .single()
-
+  const workspace = await getActiveWorkspace(supabase)
   if (!workspace) redirect('/onboarding')
 
   const [dealsResult, leadsResult, { data: { user } }] = await Promise.all([

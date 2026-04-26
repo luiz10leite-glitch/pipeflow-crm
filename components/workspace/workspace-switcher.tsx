@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { ChevronsUpDown, Check, Plus } from 'lucide-react'
 import {
   DropdownMenu,
@@ -11,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { setActiveWorkspace } from '@/app/actions/collaboration'
 import { cn } from '@/lib/utils'
 
 export interface WorkspaceInfo {
@@ -22,6 +24,7 @@ export interface WorkspaceInfo {
 
 interface WorkspaceSwitcherProps {
   workspaces: WorkspaceInfo[]
+  activeWorkspaceId: string
 }
 
 function getInitials(name: string): string {
@@ -33,11 +36,21 @@ function getInitials(name: string): string {
     .toUpperCase()
 }
 
-export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
-  const [activeId, setActiveId] = useState(workspaces[0]?.id ?? '')
-  const active = workspaces.find((w) => w.id === activeId) ?? workspaces[0]
+export function WorkspaceSwitcher({ workspaces, activeWorkspaceId }: WorkspaceSwitcherProps) {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+
+  const active = workspaces.find((w) => w.id === activeWorkspaceId) ?? workspaces[0]
 
   if (!active) return null
+
+  function handleSwitch(workspaceId: string) {
+    if (workspaceId === active?.id) return
+    startTransition(async () => {
+      await setActiveWorkspace(workspaceId)
+      router.refresh()
+    })
+  }
 
   return (
     <DropdownMenu>
@@ -45,7 +58,8 @@ export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
         className={cn(
           'flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm',
           'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
-          'outline-none transition-colors cursor-pointer'
+          'outline-none transition-colors cursor-pointer',
+          isPending && 'opacity-70'
         )}
       >
         <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-brand-600 text-xs font-bold text-white">
@@ -59,7 +73,7 @@ export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
         <DropdownMenuGroup>
           <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
           {workspaces.map((ws) => (
-            <DropdownMenuItem key={ws.id} onClick={() => setActiveId(ws.id)}>
+            <DropdownMenuItem key={ws.id} onClick={() => handleSwitch(ws.id)}>
               <span className="flex size-5 shrink-0 items-center justify-center rounded bg-brand-600/20 text-[10px] font-bold text-brand-400">
                 {getInitials(ws.name)}
               </span>
@@ -69,7 +83,7 @@ export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
                   Pro
                 </span>
               )}
-              {ws.id === activeId && <Check className="size-3.5 text-brand-500" />}
+              {ws.id === active.id && <Check className="size-3.5 text-brand-500" />}
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>

@@ -36,9 +36,10 @@ interface AppShellProps {
   children: React.ReactNode
   user: UserInfo
   workspaces: WorkspaceInfo[]
+  activeWorkspaceId: string
 }
 
-export function AppShell({ children, user, workspaces }: AppShellProps) {
+export function AppShell({ children, user, workspaces, activeWorkspaceId }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pageTitle = usePageTitle()
 
@@ -46,7 +47,7 @@ export function AppShell({ children, user, workspaces }: AppShellProps) {
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Desktop sidebar — hidden on mobile */}
       <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
-        <SidebarContent user={user} workspaces={workspaces} />
+        <SidebarContent user={user} workspaces={workspaces} activeWorkspaceId={activeWorkspaceId} />
       </aside>
 
       {/* Main area */}
@@ -71,6 +72,7 @@ export function AppShell({ children, user, workspaces }: AppShellProps) {
               <SidebarContent
                 user={user}
                 workspaces={workspaces}
+                activeWorkspaceId={activeWorkspaceId}
                 onNavigate={() => setMobileOpen(false)}
               />
             </SheetContent>

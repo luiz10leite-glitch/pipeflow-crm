@@ -25,9 +25,10 @@ interface SidebarContentProps {
   onNavigate?: () => void
   user: UserInfo
   workspaces: WorkspaceInfo[]
+  activeWorkspaceId: string
 }
 
-export function SidebarContent({ onNavigate, user, workspaces }: SidebarContentProps) {
+export function SidebarContent({ onNavigate, user, workspaces, activeWorkspaceId }: SidebarContentProps) {
   const pathname = usePathname()
 
   return (
@@ -44,7 +45,7 @@ export function SidebarContent({ onNavigate, user, workspaces }: SidebarContentP
 
       {/* Workspace switcher */}
       <div className="p-2">
-        <WorkspaceSwitcher workspaces={workspaces} />
+        <WorkspaceSwitcher workspaces={workspaces} activeWorkspaceId={activeWorkspaceId} />
       </div>
 
       <Separator />
