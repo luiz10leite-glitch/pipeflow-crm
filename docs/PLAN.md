@@ -165,12 +165,12 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 **Branch:** `milestone/08-settings-ui`
 **Objetivo:** Telas de configurações estáticas navegáveis.
 
-- [ ] Layout `/settings` com tabs laterais (Workspace, Membros, Billing)
-- [ ] Tab **Workspace**: nome, slug, logo upload (placeholder), botão salvar
-- [ ] Tab **Membros**: tabela com membros (avatar, nome, e-mail, papel, status), botão "Convidar membro" → modal com campo e-mail
-- [ ] Tab **Membros**: ação de reenviar convite e remover membro com confirmação
-- [ ] Tab **Billing**: card do plano atual (Free/Pro), botão "Fazer upgrade" (Free) ou "Gerenciar assinatura" (Pro)
-- [ ] Tab **Billing**: lista de benefícios do plano Pro com comparação
+- [x] Layout `/settings` com tabs laterais (Workspace, Membros, Billing)
+- [x] Tab **Workspace**: nome, slug, logo upload (placeholder), botão salvar
+- [x] Tab **Membros**: tabela com membros (avatar, nome, e-mail, papel, status), botão "Convidar membro" → modal com campo e-mail
+- [x] Tab **Membros**: ação de reenviar convite e remover membro com confirmação
+- [x] Tab **Billing**: card do plano atual (Free/Pro), botão "Fazer upgrade" (Free) ou "Gerenciar assinatura" (Pro)
+- [x] Tab **Billing**: lista de benefícios do plano Pro com comparação
 
 **Commit final:** `feat: settings UI — workspace, members, billing tabs (static)`
 
@@ -273,22 +273,22 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 
 ## M14 — Multiempresa
 
-**Branch:** `milestone/14-multiempresa`
+**Branch:** `feat/collaboration`
 **Objetivo:** Múltiplos workspaces funcionais, convites por e-mail, papéis e permissões reais.
 
 - [ ] Criar workspace: form na settings + Server Action `createWorkspace`
-- [ ] `WorkspaceSwitcher` carrega workspaces reais do usuário e persiste a seleção (cookie ou URL)
-- [ ] Middleware injeta `workspaceId` ativo no contexto de cada request
-- [ ] Convidar membro: Server Action `inviteMember` → grava `invites` + envia e-mail via Resend
-- [ ] Template de e-mail de convite (link com token único)
-- [ ] Rota `/invites/[token]`: aceitar convite → adiciona usuário ao workspace como membro
-- [ ] Reenviar convite: regenera token e reenvia e-mail
-- [ ] Remover membro: Server Action `removeMember` com verificação de papel Admin
-- [ ] Trocar papel de membro (admin ↔ membro): Server Action `updateMemberRole`
-- [ ] Guards de plano: bloquear convite se Free e já há 2 membros; bloquear criação de lead se Free e já há 50 leads
-- [ ] Mensagem de upgrade quando limite é atingido
+- [x] `WorkspaceSwitcher` carrega workspaces reais do usuário e persiste a seleção (cookie `active-workspace`)
+- [x] `getActiveWorkspace()` injeta `workspaceId` ativo em todas as páginas do app
+- [x] Convidar membro: Server Action `inviteMember` → grava `workspace_invites` + envia e-mail via Resend
+- [x] Template de e-mail de convite (link com token único, HTML responsivo)
+- [x] Rota `/invites/[token]`: aceitar convite → adiciona usuário ao workspace como membro
+- [x] Reenviar convite: regenera token e reenvia e-mail (`resendInvite`)
+- [x] Remover membro: Server Action `removeMember` com verificação de papel Admin
+- [x] Trocar papel de membro (admin ↔ membro): Server Action `updateMemberRole`
+- [x] Guards de plano: bloquear convite se Free e já há 2 membros
+- [x] Mensagem de upgrade quando limite é atingido
 
-**Commit final:** `feat: multiworkspace — create, switch, invite via email (Resend), roles, plan limits`
+**Commit final:** `feat: aula 3.5 — colaboração, convites por e-mail e workspace switcher real`
 
 ---
 
