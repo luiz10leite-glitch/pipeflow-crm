@@ -1,8 +1,12 @@
-import { Check, Zap } from 'lucide-react'
+'use client'
+
+import { useTransition } from 'react'
+import { Check, Loader2, Zap, ExternalLink } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { createCheckoutSession, createBillingPortalSession } from '@/app/actions/billing'
 
 const PRO_FEATURES = [
   'Membros ilimitados',
@@ -20,6 +24,19 @@ interface BillingCardProps {
 
 export function BillingCard({ plan }: BillingCardProps) {
   const isPro = plan === 'pro'
+  const [pending, startTransition] = useTransition()
+
+  function handleUpgrade() {
+    startTransition(async () => {
+      await createCheckoutSession()
+    })
+  }
+
+  function handlePortal() {
+    startTransition(async () => {
+      await createBillingPortalSession()
+    })
+  }
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -27,12 +44,8 @@ export function BillingCard({ plan }: BillingCardProps) {
       <Card className={isPro ? 'border-brand-500/50 ring-1 ring-brand-500/30' : ''}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">
-              {isPro ? 'Pro' : 'Free'}
-            </CardTitle>
-            <Badge variant={isPro ? 'default' : 'secondary'}>
-              {isPro ? 'Plano atual' : 'Plano atual'}
-            </Badge>
+            <CardTitle className="text-base">{isPro ? 'Pro' : 'Free'}</CardTitle>
+            <Badge variant={isPro ? 'default' : 'secondary'}>Plano atual</Badge>
           </div>
           <CardDescription>
             {isPro ? 'R$ 49/mês por workspace' : 'Gratuito, sem cartão'}
@@ -50,7 +63,7 @@ export function BillingCard({ plan }: BillingCardProps) {
         </CardContent>
       </Card>
 
-      {/* Upgrade card (só aparece no Free) */}
+      {/* Upgrade card (plano Free) */}
       {!isPro && (
         <Card className="border-brand-500/30 bg-brand-600/5">
           <CardHeader className="pb-3">
@@ -70,9 +83,17 @@ export function BillingCard({ plan }: BillingCardProps) {
               ))}
             </ul>
             <Separator />
-            <Button className="w-full gap-2 bg-brand-600 hover:bg-brand-700">
-              <Zap className="size-4" />
-              Fazer upgrade para Pro
+            <Button
+              className="w-full gap-2 bg-brand-600 hover:bg-brand-700"
+              disabled={pending}
+              onClick={handleUpgrade}
+            >
+              {pending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Zap className="size-4" />
+              )}
+              {pending ? 'Redirecionando...' : 'Assinar Pro'}
             </Button>
             <p className="text-center text-xs text-muted-foreground">
               Cancele quando quiser. Sem multa.
@@ -81,6 +102,7 @@ export function BillingCard({ plan }: BillingCardProps) {
         </Card>
       )}
 
+      {/* Portal card (plano Pro) */}
       {isPro && (
         <Card>
           <CardHeader className="pb-3">
@@ -88,8 +110,18 @@ export function BillingCard({ plan }: BillingCardProps) {
             <CardDescription>Gerencie seu plano e pagamentos.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full">
-              Gerenciar assinatura
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+              disabled={pending}
+              onClick={handlePortal}
+            >
+              {pending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <ExternalLink className="size-4" />
+              )}
+              {pending ? 'Abrindo portal...' : 'Gerenciar assinatura'}
             </Button>
           </CardContent>
         </Card>
