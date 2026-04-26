@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
 const schema = z.object({
   email: z.string().min(1, 'E-mail obrigatório').email('E-mail inválido'),
@@ -27,9 +28,12 @@ export function ForgotPasswordForm() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) })
 
-  async function onSubmit() {
-    // Fake delay — será substituído pelo Supabase Auth no M10
-    await new Promise((r) => setTimeout(r, 800))
+  async function onSubmit(data: FormData) {
+    const supabase = getSupabaseBrowserClient()
+    await supabase.auth.resetPasswordForEmail(data.email, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/settings`,
+    })
+    // Sempre mostra sucesso para não expor quais e-mails existem
     setSent(true)
   }
 

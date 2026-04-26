@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronsUpDown, LogOut, Settings, User } from 'lucide-react'
-import { MOCK_USER } from '@/lib/mock-data'
+import { signOut } from '@/app/actions/auth'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,13 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 
-export function UserMenu() {
+interface UserMenuProps {
+  name: string
+  email: string
+  initials: string
+}
+
+export function UserMenu({ name, email, initials }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -25,11 +31,11 @@ export function UserMenu() {
         )}
       >
         <Avatar size="sm">
-          <AvatarFallback>{MOCK_USER.initials}</AvatarFallback>
+          <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
         <div className="flex min-w-0 flex-1 flex-col items-start">
-          <span className="w-full truncate text-sm font-medium">{MOCK_USER.name}</span>
-          <span className="w-full truncate text-xs text-muted-foreground">{MOCK_USER.email}</span>
+          <span className="w-full truncate text-sm font-medium">{name}</span>
+          <span className="w-full truncate text-xs text-muted-foreground">{email}</span>
         </div>
         <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
@@ -47,7 +53,7 @@ export function UserMenu() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive">
+        <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
           <LogOut className="size-4" />
           Sair
         </DropdownMenuItem>

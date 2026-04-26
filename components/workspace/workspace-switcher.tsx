@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { ChevronsUpDown, Check, Plus } from 'lucide-react'
-import { MOCK_WORKSPACES, MOCK_ACTIVE_WORKSPACE_ID } from '@/lib/mock-data'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,9 +13,31 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 
-export function WorkspaceSwitcher() {
-  const [activeId, setActiveId] = useState(MOCK_ACTIVE_WORKSPACE_ID)
-  const active = MOCK_WORKSPACES.find((w) => w.id === activeId) ?? MOCK_WORKSPACES[0]
+export interface WorkspaceInfo {
+  id: string
+  name: string
+  slug: string
+  plan: 'free' | 'pro'
+}
+
+interface WorkspaceSwitcherProps {
+  workspaces: WorkspaceInfo[]
+}
+
+function getInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+}
+
+export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
+  const [activeId, setActiveId] = useState(workspaces[0]?.id ?? '')
+  const active = workspaces.find((w) => w.id === activeId) ?? workspaces[0]
+
+  if (!active) return null
 
   return (
     <DropdownMenu>
@@ -28,7 +49,7 @@ export function WorkspaceSwitcher() {
         )}
       >
         <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-brand-600 text-xs font-bold text-white">
-          {active.initials}
+          {getInitials(active.name)}
         </span>
         <span className="flex-1 truncate text-left font-medium">{active.name}</span>
         <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
@@ -37,10 +58,10 @@ export function WorkspaceSwitcher() {
       <DropdownMenuContent side="bottom" align="start" sideOffset={6}>
         <DropdownMenuGroup>
           <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
-          {MOCK_WORKSPACES.map((ws) => (
+          {workspaces.map((ws) => (
             <DropdownMenuItem key={ws.id} onClick={() => setActiveId(ws.id)}>
               <span className="flex size-5 shrink-0 items-center justify-center rounded bg-brand-600/20 text-[10px] font-bold text-brand-400">
-                {ws.initials}
+                {getInitials(ws.name)}
               </span>
               <span className="flex-1 truncate">{ws.name}</span>
               {ws.plan === 'pro' && (

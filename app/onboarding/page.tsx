@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { createWorkspace } from '@/app/actions/workspace'
 
 const schema = z.object({
   workspaceName: z
@@ -20,7 +21,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export default function OnboardingPage() {
-  const router = useRouter()
+  const [serverError, setServerError] = useState<string | null>(null)
 
   const {
     register,
@@ -31,10 +32,12 @@ export default function OnboardingPage() {
     defaultValues: { workspaceName: '' },
   })
 
-  async function onSubmit() {
-    // Fake delay — será substituído pela criação real no M10
-    await new Promise((r) => setTimeout(r, 800))
-    router.push('/dashboard')
+  async function onSubmit({ workspaceName }: FormData) {
+    setServerError(null)
+    const fd = new FormData()
+    fd.set('workspaceName', workspaceName)
+    const result = await createWorkspace(fd)
+    if (result?.error) setServerError(result.error)
   }
 
   return (
@@ -50,6 +53,12 @@ export default function OnboardingPage() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
+          {serverError && (
+            <p className="rounded-md bg-red-500/10 px-3 py-2 text-sm text-red-400">
+              {serverError}
+            </p>
+          )}
+
           <div className="space-y-1.5">
             <Label htmlFor="workspaceName" className="text-neutral-200">
               Nome do workspace

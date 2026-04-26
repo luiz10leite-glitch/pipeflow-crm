@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Users, Kanban, Settings } from 'lucide-react'
-import { WorkspaceSwitcher } from '@/components/workspace/workspace-switcher'
+import { WorkspaceSwitcher, type WorkspaceInfo } from '@/components/workspace/workspace-switcher'
 import { UserMenu } from '@/components/layout/user-menu'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
@@ -15,11 +15,19 @@ const NAV_ITEMS = [
   { label: 'Configurações', href: '/settings', icon: Settings },
 ]
 
-interface SidebarContentProps {
-  onNavigate?: () => void
+interface UserInfo {
+  name: string
+  email: string
+  initials: string
 }
 
-export function SidebarContent({ onNavigate }: SidebarContentProps) {
+interface SidebarContentProps {
+  onNavigate?: () => void
+  user: UserInfo
+  workspaces: WorkspaceInfo[]
+}
+
+export function SidebarContent({ onNavigate, user, workspaces }: SidebarContentProps) {
   const pathname = usePathname()
 
   return (
@@ -36,7 +44,7 @@ export function SidebarContent({ onNavigate }: SidebarContentProps) {
 
       {/* Workspace switcher */}
       <div className="p-2">
-        <WorkspaceSwitcher />
+        <WorkspaceSwitcher workspaces={workspaces} />
       </div>
 
       <Separator />
@@ -71,7 +79,7 @@ export function SidebarContent({ onNavigate }: SidebarContentProps) {
 
       {/* User menu */}
       <div className="p-2">
-        <UserMenu />
+        <UserMenu name={user.name} email={user.email} initials={user.initials} />
       </div>
     </div>
   )
