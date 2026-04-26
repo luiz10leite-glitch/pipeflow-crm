@@ -8,10 +8,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { Deal } from '@/types/pipeline'
+
+interface UpcomingDeal {
+  id: string
+  title: string
+  value: number
+  due_date: string
+  leadName: string
+}
 
 interface DealsTableProps {
-  deals: Deal[]
+  deals: UpcomingDeal[]
   today: Date
 }
 
@@ -23,13 +30,13 @@ function formatDate(dateStr: string) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
 }
 
-function urgencyBadge(dueDate: string, today: Date) {
-  const due = new Date(dueDate + 'T00:00:00')
+function urgencyBadge(due_date: string, today: Date) {
+  const due = new Date(due_date + 'T00:00:00')
   const diffDays = Math.ceil((due.getTime() - today.getTime()) / 86400000)
 
-  if (diffDays < 0) return <Badge variant="destructive">Vencido</Badge>
+  if (diffDays < 0)  return <Badge variant="destructive">Vencido</Badge>
   if (diffDays === 0) return <Badge variant="destructive">Hoje</Badge>
-  if (diffDays <= 2) return <Badge className="bg-amber-500/15 text-amber-600 hover:bg-amber-500/15">Em {diffDays}d</Badge>
+  if (diffDays <= 2)  return <Badge className="bg-amber-500/15 text-amber-600 hover:bg-amber-500/15">Em {diffDays}d</Badge>
   return <Badge variant="secondary">Em {diffDays}d</Badge>
 }
 
@@ -55,15 +62,15 @@ export function DealsTable({ deals, today }: DealsTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {deals.map((deal) => (
+              {deals.map(deal => (
                 <TableRow key={deal.id}>
                   <TableCell className="font-medium max-w-[160px] truncate">{deal.title}</TableCell>
                   <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">{deal.leadName}</TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">{formatBRL(deal.value)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex flex-col items-end gap-1">
-                      <span className="text-xs text-muted-foreground">{formatDate(deal.dueDate!)}</span>
-                      {urgencyBadge(deal.dueDate!, today)}
+                      <span className="text-xs text-muted-foreground">{formatDate(deal.due_date)}</span>
+                      {urgencyBadge(deal.due_date, today)}
                     </div>
                   </TableCell>
                 </TableRow>

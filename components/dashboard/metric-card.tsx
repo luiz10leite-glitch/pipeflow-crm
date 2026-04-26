@@ -6,14 +6,14 @@ import type { LucideIcon } from 'lucide-react'
 interface MetricCardProps {
   label: string
   value: string
-  change: number // percentage, positive = up, negative = down
+  change?: number // percentage, positive = up, negative = down
   icon: LucideIcon
   iconColor?: string
 }
 
 export function MetricCard({ label, value, change, icon: Icon, iconColor = 'text-brand' }: MetricCardProps) {
-  const isPositive = change > 0
-  const isNeutral = change === 0
+  const isPositive = (change ?? 0) > 0
+  const isNeutral = (change ?? 0) === 0
 
   return (
     <Card>
@@ -42,7 +42,7 @@ export function MetricCard({ label, value, change, icon: Icon, iconColor = 'text
               isNeutral ? 'text-muted-foreground' : isPositive ? 'text-green-600' : 'text-red-500'
             )}
           >
-            {isNeutral ? '0%' : `${isPositive ? '+' : ''}${change}%`}
+            {isNeutral ? '—' : `${isPositive ? '+' : ''}${change}%`}
           </span>
           <span className="text-muted-foreground">vs mês anterior</span>
         </div>

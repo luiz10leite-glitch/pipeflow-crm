@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { LeadStatusBadge } from './lead-status-badge'
-import type { Lead } from '@/types/lead'
+import type { Lead } from '@/types/supabase'
 
 function getInitials(name: string) {
   return name
@@ -18,7 +18,7 @@ function getInitials(name: string) {
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr + 'T12:00:00').toLocaleDateString('pt-BR', {
+  return new Date(dateStr).toLocaleDateString('pt-BR', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -51,7 +51,9 @@ export function LeadCard({ lead, onEdit }: LeadCardProps) {
             </Avatar>
             <div className="min-w-0">
               <CardTitle className="truncate">{lead.name}</CardTitle>
-              <CardDescription className="truncate">{lead.role || lead.company}</CardDescription>
+              <CardDescription className="truncate">
+                {lead.job_title || lead.company || '—'}
+              </CardDescription>
             </div>
           </div>
           <Button
@@ -68,23 +70,29 @@ export function LeadCard({ lead, onEdit }: LeadCardProps) {
 
       <CardContent className="space-y-3">
         <div className="space-y-1.5 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1.5 truncate">
-            <Building2 className="size-3.5 shrink-0" />
-            <span className="truncate">{lead.company}</span>
-          </div>
-          <div className="flex items-center gap-1.5 truncate">
-            <Mail className="size-3.5 shrink-0" />
-            <span className="truncate">{lead.email}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Phone className="size-3.5 shrink-0" />
-            <span>{lead.phone}</span>
-          </div>
+          {lead.company && (
+            <div className="flex items-center gap-1.5 truncate">
+              <Building2 className="size-3.5 shrink-0" />
+              <span className="truncate">{lead.company}</span>
+            </div>
+          )}
+          {lead.email && (
+            <div className="flex items-center gap-1.5 truncate">
+              <Mail className="size-3.5 shrink-0" />
+              <span className="truncate">{lead.email}</span>
+            </div>
+          )}
+          {lead.phone && (
+            <div className="flex items-center gap-1.5">
+              <Phone className="size-3.5 shrink-0" />
+              <span>{lead.phone}</span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-between pt-1 border-t border-border/50">
           <LeadStatusBadge status={lead.status} />
-          <span className="text-xs text-muted-foreground">{formatDate(lead.createdAt)}</span>
+          <span className="text-xs text-muted-foreground">{formatDate(lead.created_at)}</span>
         </div>
       </CardContent>
     </Card>

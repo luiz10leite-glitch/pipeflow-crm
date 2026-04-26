@@ -219,18 +219,18 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 
 ## M11 — Leads Backend
 
-**Branch:** `milestone/11-leads-backend`
+**Branch:** `feat/leads-data`
 **Objetivo:** CRUD real de leads e atividades substituindo todos os mocks.
 
-- [ ] Server Action ou Route Handler: `createLead`, `updateLead`, `deleteLead`
+- [x] Server Action ou Route Handler: `createLead`, `updateLead`, `deleteLead`
 - [ ] Server Action: `createActivity`
-- [ ] Página `/leads` carrega leads reais do workspace atual (Server Component)
+- [x] Página `/leads` carrega leads reais do workspace atual (Server Component)
 - [ ] Busca e filtros com query params persistidos na URL (`?search=&status=&owner=`)
-- [ ] Página `/leads/[id]` carrega lead real + atividades ordenadas por `created_at DESC`
-- [ ] Formulários de lead e atividade submetendo para as actions reais
+- [x] Página `/leads/[id]` carrega lead real + atividades ordenadas por `created_at DESC`
+- [x] Formulários de lead e atividade submetendo para as actions reais
 - [ ] Validação Zod nas actions (server-side)
 - [ ] Feedback de sucesso/erro com toast (`sonner`)
-- [ ] Remover `lib/mock-data.ts` (leads)
+- [x] Remover `lib/mock-data.ts` (leads)
 
 **Commit final:** `feat: leads backend — real CRUD, activities, search, filters connected to Supabase`
 
@@ -238,16 +238,16 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 
 ## M12 — Pipeline Backend
 
-**Branch:** `milestone/12-pipeline-backend`
+**Branch:** `feat/leads-data`
 **Objetivo:** Deals persistidos no banco, drag-and-drop com atualização real de estágio.
 
-- [ ] Server Action: `createDeal`, `updateDeal`, `deleteDeal`, `updateDealStage`
-- [ ] Página `/pipeline` carrega deals reais agrupados por estágio (Server Component)
-- [ ] Drag-and-drop chama `updateDealStage` ao soltar card em nova coluna
-- [ ] Optimistic update no cliente para UX fluida (sem esperar resposta do servidor)
-- [ ] Sheet de detalhe do deal com dados reais
-- [ ] Formulário de deal conectado a lead real (select com busca de leads do workspace)
-- [ ] Remover mocks de deals
+- [x] Server Action: `createDeal`, `updateDeal`, `deleteDeal`
+- [x] Página `/pipeline` carrega deals reais agrupados por estágio (Server Component)
+- [x] Drag-and-drop chama `updateDeal` ao soltar card em nova coluna
+- [x] Optimistic update no cliente para UX fluida (sem esperar resposta do servidor)
+- [x] Sheet de detalhe do deal com dados reais
+- [x] Formulário de deal conectado a lead real (select com busca de leads do workspace)
+- [x] Remover mocks de deals
 
 **Commit final:** `feat: pipeline backend — real deals CRUD, drag-and-drop persistence, optimistic updates`
 
@@ -255,17 +255,17 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 
 ## M13 — Dashboard Backend
 
-**Branch:** `milestone/13-dashboard-backend`
+**Branch:** `feat/leads-data`
 **Objetivo:** Métricas e gráfico calculados com queries reais.
 
-- [ ] Query: total de leads do workspace
-- [ ] Query: deals abertos (excluindo Fechado Ganho/Perdido)
-- [ ] Query: soma do valor dos deals abertos (valor do pipeline)
-- [ ] Query: taxa de conversão = Fechado Ganho / (Fechado Ganho + Fechado Perdido)
-- [ ] Query: contagem de leads por estágio para o `FunnelChart`
-- [ ] Query: deals com `due_date` nos próximos 7 dias para `DealsTable`
-- [ ] Todas as queries em Server Components (sem useEffect)
-- [ ] Remover mocks do dashboard
+- [x] Query: total de leads do workspace
+- [x] Query: deals abertos (excluindo Fechado Ganho/Perdido)
+- [x] Query: soma do valor dos deals abertos (valor do pipeline)
+- [x] Query: taxa de conversão = Fechado Ganho / (Fechado Ganho + Fechado Perdido)
+- [x] Query: contagem de leads por estágio para o `FunnelChart`
+- [x] Query: deals com `due_date` nos próximos 7 dias para `DealsTable`
+- [x] Todas as queries em Server Components (sem useEffect)
+- [x] Remover mocks do dashboard
 
 **Commit final:** `feat: dashboard backend — real metrics, funnel data, upcoming deals from Supabase`
 

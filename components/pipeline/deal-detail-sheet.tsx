@@ -8,14 +8,15 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { STAGE_CONFIG } from '@/lib/mock-data'
-import type { Deal } from '@/types/pipeline'
+import { STAGE_CONFIG, PIPELINE_STAGES } from '@/lib/constants'
+import type { DealWithLead } from '@/types/pipeline'
 
 interface DealDetailSheetProps {
-  deal: Deal | null
+  deal: DealWithLead | null
+  userName: string
   open: boolean
   onOpenChange: (open: boolean) => void
-  onEdit: (deal: Deal) => void
+  onEdit: (deal: DealWithLead) => void
 }
 
 function formatCurrency(value: number) {
@@ -39,25 +40,24 @@ function getInitials(name: string) {
   return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
 }
 
-function getDaysUntil(dueDate: string): number {
-  return Math.ceil((new Date(dueDate + 'T12:00:00').getTime() - Date.now()) / 86400000)
+function getDaysUntil(due_date: string): number {
+  return Math.ceil((new Date(due_date + 'T12:00:00').getTime() - Date.now()) / 86400000)
 }
 
-export function DealDetailSheet({ deal, open, onOpenChange, onEdit }: DealDetailSheetProps) {
+export function DealDetailSheet({ deal, userName, open, onOpenChange, onEdit }: DealDetailSheetProps) {
   if (!deal) return null
   const stage = STAGE_CONFIG[deal.stage]
-  const daysUntil = deal.dueDate ? getDaysUntil(deal.dueDate) : null
+  const daysUntil = deal.due_date ? getDaysUntil(deal.due_date) : null
+  const leadName = deal.lead?.name ?? '—'
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-[420px]">
-        {/* Stage top bar */}
         <div
           className="h-1 w-full shrink-0"
           style={{ background: `linear-gradient(90deg, ${stage.shadowColor}, ${stage.shadowColor}50)` }}
         />
 
-        {/* Header */}
         <SheetHeader className="border-b px-6 py-5">
           <div className="flex items-start justify-between gap-3 pr-8">
             <div className="space-y-2">
@@ -81,7 +81,6 @@ export function DealDetailSheet({ deal, open, onOpenChange, onEdit }: DealDetail
         </SheetHeader>
 
         <div className="flex flex-col gap-6 overflow-y-auto p-6">
-          {/* Value hero */}
           <div
             className="rounded-xl p-4"
             style={{ background: `${stage.shadowColor}08`, border: `1px solid ${stage.shadowColor}20` }}
@@ -104,25 +103,22 @@ export function DealDetailSheet({ deal, open, onOpenChange, onEdit }: DealDetail
             </div>
           </div>
 
-          {/* Details */}
           <div className="space-y-4">
             <h4 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Detalhes
             </h4>
 
             <div className="space-y-3">
-              {/* Lead */}
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
                   <Building2 className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
                   <p className="text-[11px] text-muted-foreground">Lead vinculado</p>
-                  <p className="text-sm font-medium">{deal.leadName}</p>
+                  <p className="text-sm font-medium">{leadName}</p>
                 </div>
               </div>
 
-              {/* Responsible */}
               <div className="flex items-center gap-3">
                 <div
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
@@ -132,25 +128,24 @@ export function DealDetailSheet({ deal, open, onOpenChange, onEdit }: DealDetail
                     border: `1px solid ${stage.shadowColor}30`,
                   }}
                 >
-                  {getInitials(deal.responsible)}
+                  {getInitials(userName)}
                 </div>
                 <div>
                   <p className="text-[11px] text-muted-foreground">Responsável</p>
-                  <p className="text-sm font-medium">{deal.responsible}</p>
+                  <p className="text-sm font-medium">{userName}</p>
                 </div>
               </div>
 
-              {/* Due date */}
-              {deal.dueDate && (
+              {deal.due_date && (
                 <div className="flex items-center gap-3">
                   <div className={[
                     'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
-                    daysUntil !== null && daysUntil < 0 ? 'bg-red-500/15' :
+                    daysUntil !== null && daysUntil < 0  ? 'bg-red-500/15'    :
                     daysUntil !== null && daysUntil <= 3 ? 'bg-orange-500/15' : 'bg-muted',
                   ].join(' ')}>
                     <CalendarDays className={[
                       'h-4 w-4',
-                      daysUntil !== null && daysUntil < 0 ? 'text-red-400' :
+                      daysUntil !== null && daysUntil < 0  ? 'text-red-400'    :
                       daysUntil !== null && daysUntil <= 3 ? 'text-orange-400' : 'text-muted-foreground',
                     ].join(' ')} />
                   </div>
@@ -171,34 +166,33 @@ export function DealDetailSheet({ deal, open, onOpenChange, onEdit }: DealDetail
                         </span>
                       )}
                     </p>
-                    <p className="text-sm font-medium capitalize">{formatDate(deal.dueDate)}</p>
+                    <p className="text-sm font-medium capitalize">{formatDate(deal.due_date)}</p>
                   </div>
                 </div>
               )}
 
-              {/* Created at */}
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
                   <p className="text-[11px] text-muted-foreground">Criado em</p>
-                  <p className="text-sm font-medium capitalize">{formatDate(deal.createdAt)}</p>
+                  <p className="text-sm font-medium capitalize">{formatDate(deal.created_at)}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Stage progress */}
           <div className="space-y-2">
             <h4 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Progresso no pipeline
             </h4>
             <div className="flex gap-1">
-              {(['new_lead', 'contacted', 'proposal_sent', 'negotiation', 'closed_won', 'closed_lost'] as const).map((s, i) => {
+              {PIPELINE_STAGES.map((s, i) => {
                 const cfg = STAGE_CONFIG[s]
                 const isActive = s === deal.stage
-                const isBefore = ['new_lead', 'contacted', 'proposal_sent', 'negotiation', 'closed_won', 'closed_lost'].indexOf(deal.stage) > i && deal.stage !== 'closed_lost'
+                const stageIndex = PIPELINE_STAGES.indexOf(deal.stage)
+                const isBefore = stageIndex > i && deal.stage !== 'closed_lost'
                 return (
                   <div
                     key={s}
@@ -206,10 +200,9 @@ export function DealDetailSheet({ deal, open, onOpenChange, onEdit }: DealDetail
                     style={{
                       background: isActive
                         ? cfg.shadowColor
-                        : isBefore && deal.stage !== 'closed_lost'
+                        : isBefore
                         ? `${cfg.shadowColor}50`
-                        : undefined,
-                      backgroundColor: !isActive && !isBefore ? 'hsl(var(--muted))' : undefined,
+                        : 'hsl(var(--muted))',
                     }}
                     title={cfg.label}
                   />

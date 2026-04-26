@@ -4,15 +4,18 @@ import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { Plus } from 'lucide-react'
 import { DealCard } from './deal-card'
-import type { Deal, DealStage, StageConfig } from '@/types/pipeline'
+import type { DealStage } from '@/types/supabase'
+import type { DealWithLead } from '@/types/pipeline'
+import type { StageConfig } from '@/lib/constants'
 
 interface KanbanColumnProps {
   stage: DealStage
   config: StageConfig
-  deals: Deal[]
+  deals: DealWithLead[]
+  userName: string
   index: number
   onAddDeal: (stage: DealStage) => void
-  onOpenDetail: (deal: Deal) => void
+  onOpenDetail: (deal: DealWithLead) => void
 }
 
 function formatCurrency(value: number) {
@@ -27,6 +30,7 @@ export function KanbanColumn({
   stage,
   config,
   deals,
+  userName,
   index,
   onAddDeal,
   onOpenDetail,
@@ -39,16 +43,13 @@ export function KanbanColumn({
       className="kanban-col-enter flex w-[272px] shrink-0 flex-col"
       style={{ animationDelay: `${index * 70}ms` }}
     >
-      {/* Column header */}
       <div className="mb-2 overflow-hidden rounded-xl border border-border/60 bg-card">
-        {/* Stage color bar */}
         <div
           className="h-[3px] w-full"
           style={{ background: `linear-gradient(90deg, ${config.shadowColor}, ${config.shadowColor}60)` }}
         />
 
         <div className="px-3 py-2.5">
-          {/* Stage name + count */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[13px] font-semibold text-foreground">{config.label}</span>
@@ -64,7 +65,6 @@ export function KanbanColumn({
               </span>
             </div>
 
-            {/* Add button */}
             <button
               onClick={() => onAddDeal(stage)}
               className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground/50 transition-colors hover:bg-muted hover:text-foreground"
@@ -74,14 +74,12 @@ export function KanbanColumn({
             </button>
           </div>
 
-          {/* Total value */}
           <p className="mt-1 text-lg font-bold tabular-nums tracking-tight text-foreground">
             {formatCurrency(totalValue)}
           </p>
         </div>
       </div>
 
-      {/* Cards container / drop zone */}
       <div
         ref={setNodeRef}
         className={[
@@ -103,7 +101,7 @@ export function KanbanColumn({
       >
         <SortableContext items={deals.map(d => d.id)} strategy={verticalListSortingStrategy}>
           {deals.map(deal => (
-            <DealCard key={deal.id} deal={deal} onOpenDetail={onOpenDetail} />
+            <DealCard key={deal.id} deal={deal} userName={userName} onOpenDetail={onOpenDetail} />
           ))}
         </SortableContext>
 
@@ -123,7 +121,6 @@ export function KanbanColumn({
         )}
       </div>
 
-      {/* Bottom add button (when column has deals) */}
       {deals.length > 0 && (
         <button
           onClick={() => onAddDeal(stage)}

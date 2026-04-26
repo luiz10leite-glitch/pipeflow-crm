@@ -1,16 +1,16 @@
 import { Phone, Mail, CalendarDays, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { Activity, ActivityType } from '@/types/lead'
+import type { Activity, ActivityType } from '@/types/supabase'
 
 const ACTIVITY_CONFIG: Record<ActivityType, {
   icon: React.ElementType
   label: string
   className: string
 }> = {
-  ligacao: { icon: Phone,        label: 'Ligação',  className: 'bg-blue-500/15 text-blue-400' },
-  email:   { icon: Mail,         label: 'E-mail',   className: 'bg-violet-500/15 text-violet-400' },
-  reuniao: { icon: CalendarDays, label: 'Reunião',  className: 'bg-amber-500/15 text-amber-400' },
-  nota:    { icon: FileText,     label: 'Nota',     className: 'bg-neutral-500/15 text-neutral-400' },
+  call:    { icon: Phone,        label: 'Ligação', className: 'bg-blue-500/15 text-blue-400' },
+  email:   { icon: Mail,         label: 'E-mail',  className: 'bg-violet-500/15 text-violet-400' },
+  meeting: { icon: CalendarDays, label: 'Reunião', className: 'bg-amber-500/15 text-amber-400' },
+  note:    { icon: FileText,     label: 'Nota',    className: 'bg-neutral-500/15 text-neutral-400' },
 }
 
 function formatDateTime(isoStr: string) {
@@ -37,13 +37,13 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
   }
 
   const sorted = [...activities].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   )
 
   return (
     <div>
       {sorted.map((activity, i) => {
-        const config = ACTIVITY_CONFIG[activity.type]
+        const config = ACTIVITY_CONFIG[activity.type] ?? ACTIVITY_CONFIG['note']
         const Icon = config.icon
         const isLast = i === sorted.length - 1
 
@@ -58,7 +58,7 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
             <div className={cn('min-w-0 flex-1', !isLast && 'pb-5')}>
               <p className="text-sm leading-relaxed">{activity.description}</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {config.label} &middot; {activity.createdBy} &middot; {formatDateTime(activity.createdAt)}
+                {config.label} &middot; {formatDateTime(activity.created_at)}
               </p>
             </div>
           </div>

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useTransition, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   DndContext,
   DragOverlay,
@@ -16,14 +17,12 @@ import { TrendingUp, Kanban, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { KanbanColumn } from './kanban-column'
 import { DealCard } from './deal-card'
-import { DealForm, type DealFormData } from './deal-form'
+import { DealForm } from './deal-form'
 import { DealDetailSheet } from './deal-detail-sheet'
-import { MOCK_DEALS, MOCK_LEADS, STAGE_CONFIG, PIPELINE_STAGES } from '@/lib/mock-data'
-import type { Deal, DealStage } from '@/types/pipeline'
-
-function generateId() {
-  return `d${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-}
+import { updateDeal } from '@/app/actions/deals'
+import { STAGE_CONFIG, PIPELINE_STAGES } from '@/lib/constants'
+import type { Lead, DealStage } from '@/types/supabase'
+import type { DealWithLead } from '@/types/pipeline'
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('pt-BR', {
@@ -33,23 +32,35 @@ function formatCurrency(value: number) {
   }).format(value)
 }
 
-export function KanbanBoard() {
-  const [deals, setDeals] = useState<Deal[]>(MOCK_DEALS)
-  const [activeDeal, setActiveDeal] = useState<Deal | null>(null)
+interface KanbanBoardProps {
+  initialDeals: DealWithLead[]
+  leads: Pick<Lead, 'id' | 'name' | 'company' | 'job_title'>[]
+  userName: string
+}
 
-  const [detailDeal, setDetailDeal] = useState<Deal | null>(null)
+export function KanbanBoard({ initialDeals, leads, userName }: KanbanBoardProps) {
+  const router = useRouter()
+  const [deals, setDeals] = useState<DealWithLead[]>(initialDeals)
+  const [activeDeal, setActiveDeal] = useState<DealWithLead | null>(null)
+  const [, startTransition] = useTransition()
+
+  const [detailDeal, setDetailDeal] = useState<DealWithLead | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
 
   const [formOpen, setFormOpen] = useState(false)
-  const [formDeal, setFormDeal] = useState<Deal | undefined>(undefined)
-  const [formStage, setFormStage] = useState<DealStage>('new_lead')
+  const [formDeal, setFormDeal] = useState<DealWithLead | undefined>(undefined)
+  const [formStage, setFormStage] = useState<DealStage>('lead')
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
-  // Derived stats
+  // Sincroniza estado local quando o Server Component re-renderiza com dados frescos
+  useEffect(() => {
+    setDeals(initialDeals)
+  }, [initialDeals])
+
   const activeDeals = deals.filter(d => d.stage !== 'closed_won' && d.stage !== 'closed_lost')
   const totalPipelineValue = activeDeals.reduce((s, d) => s + d.value, 0)
   const wonDeals = deals.filter(d => d.stage === 'closed_won')
@@ -73,10 +84,21 @@ export function KanbanBoard() {
       : deals.find(d => d.id === overId)?.stage
 
     if (!targetStage) return
+
+    const currentStage = deals.find(d => d.id === dealId)?.stage
+    if (currentStage === targetStage) return
+
+    // Optimistic update
     setDeals(prev => prev.map(d => d.id === dealId ? { ...d, stage: targetStage } : d))
+
+    // Persist in background
+    startTransition(async () => {
+      await updateDeal(dealId, { stage: targetStage })
+      router.refresh()
+    })
   }
 
-  const handleOpenDetail = useCallback((deal: Deal) => {
+  const handleOpenDetail = useCallback((deal: DealWithLead) => {
     setDetailDeal(deal)
     setDetailOpen(true)
   }, [])
@@ -87,54 +109,17 @@ export function KanbanBoard() {
     setFormOpen(true)
   }
 
-  function handleEditFromDetail(deal: Deal) {
+  function handleEditFromDetail(deal: DealWithLead) {
     setDetailOpen(false)
     setFormDeal(deal)
     setFormStage(deal.stage)
     setFormOpen(true)
   }
 
-  function handleSaveDeal(data: DealFormData) {
-    const leadName =
-      MOCK_LEADS.find(l => l.id === data.leadId)?.name ??
-      deals.find(d => d.leadId === data.leadId)?.leadName ??
-      data.leadId
-
-    if (data.id) {
-      setDeals(prev =>
-        prev.map(d =>
-          d.id === data.id
-            ? { ...d, title: data.title, value: data.value, stage: data.stage, leadId: data.leadId, leadName, responsible: data.responsible, dueDate: data.dueDate ?? null }
-            : d
-        )
-      )
-    } else {
-      setDeals(prev => [
-        ...prev,
-        {
-          id: generateId(),
-          title: data.title,
-          value: data.value,
-          stage: data.stage,
-          leadId: data.leadId,
-          leadName,
-          responsible: data.responsible,
-          dueDate: data.dueDate ?? null,
-          createdAt: new Date().toISOString().slice(0, 10),
-        },
-      ])
-    }
-  }
-
-  function handleDeleteDeal(id: string) {
-    setDeals(prev => prev.filter(d => d.id !== id))
-  }
-
   return (
     <div className="flex flex-col gap-4">
-      {/* Pipeline summary bar */}
+      {/* Summary bar */}
       <div className="flex items-center gap-3 overflow-x-auto pb-1">
-        {/* Total active */}
         <div className="flex shrink-0 items-center gap-3 rounded-xl border border-border/60 bg-card px-4 py-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
             <Kanban className="h-4 w-4 text-primary" />
@@ -154,29 +139,21 @@ export function KanbanBoard() {
           </div>
         </div>
 
-        {/* Won */}
         <div className="flex shrink-0 items-center gap-3 rounded-xl border border-green-500/20 bg-green-500/5 px-4 py-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/15">
             <TrendingUp className="h-4 w-4 text-green-400" />
           </div>
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-green-400/70">
-              Ganhos
-            </p>
-            <p className="text-base font-bold tabular-nums text-green-400">
-              {formatCurrency(wonValue)}
-            </p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-green-400/70">Ganhos</p>
+            <p className="text-base font-bold tabular-nums text-green-400">{formatCurrency(wonValue)}</p>
           </div>
           <div className="ml-1 h-8 w-px bg-green-500/20" />
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-green-400/70">
-              Fechados
-            </p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-green-400/70">Fechados</p>
             <p className="text-base font-bold tabular-nums text-green-400">{wonDeals.length}</p>
           </div>
         </div>
 
-        {/* Stage mini-pills */}
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
           {PIPELINE_STAGES.map(s => {
             const count = deals.filter(d => d.stage === s).length
@@ -198,11 +175,10 @@ export function KanbanBoard() {
           })}
         </div>
 
-        {/* Global add button */}
         <Button
           size="sm"
           className="shrink-0 gap-1.5"
-          onClick={() => handleAddDeal('new_lead')}
+          onClick={() => handleAddDeal('lead')}
         >
           <Plus className="h-4 w-4" />
           Novo Deal
@@ -221,19 +197,18 @@ export function KanbanBoard() {
               stage={stage}
               config={STAGE_CONFIG[stage]}
               deals={deals.filter(d => d.stage === stage)}
+              userName={userName}
               index={index}
               onAddDeal={handleAddDeal}
               onOpenDetail={handleOpenDetail}
             />
           ))}
-
-          {/* Spacer so last column has breathing room */}
           <div className="w-2 shrink-0" />
         </div>
 
         <DragOverlay dropAnimation={null}>
           {activeDeal && (
-            <DealCard deal={activeDeal} onOpenDetail={() => {}} isDragOverlay />
+            <DealCard deal={activeDeal} userName={userName} onOpenDetail={() => {}} isDragOverlay />
           )}
         </DragOverlay>
       </DndContext>
@@ -241,14 +216,14 @@ export function KanbanBoard() {
       <DealForm
         deal={formDeal}
         defaultStage={formStage}
+        leads={leads}
         open={formOpen}
         onOpenChange={setFormOpen}
-        onSave={handleSaveDeal}
-        onDelete={handleDeleteDeal}
       />
 
       <DealDetailSheet
         deal={detailDeal}
+        userName={userName}
         open={detailOpen}
         onOpenChange={setDetailOpen}
         onEdit={handleEditFromDetail}

@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -13,25 +14,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import type { Lead, LeadStatus } from '@/types/lead'
+import { createLead, updateLead, deleteLead } from '@/app/actions/leads'
+import type { Lead, LeadStatus } from '@/types/supabase'
 
 const LEAD_STATUSES: { value: LeadStatus; label: string }[] = [
-  { value: 'novo',        label: 'Novo' },
-  { value: 'contato',     label: 'Contato' },
-  { value: 'qualificado', label: 'Qualificado' },
-  { value: 'proposta',    label: 'Proposta' },
-  { value: 'negociacao',  label: 'Negociação' },
-  { value: 'ganho',       label: 'Ganho' },
-  { value: 'perdido',     label: 'Perdido' },
+  { value: 'new',         label: 'Novo' },
+  { value: 'contacted',   label: 'Contato' },
+  { value: 'qualified',   label: 'Qualificado' },
+  { value: 'unqualified', label: 'Desqualificado' },
+  { value: 'converted',   label: 'Convertido' },
 ]
 
 const schema = z.object({
-  name:    z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  email:   z.string().email('E-mail inválido'),
-  phone:   z.string().min(1, 'Telefone obrigatório'),
-  company: z.string().min(1, 'Empresa obrigatória'),
-  role:    z.string(),
-  status:  z.enum(['novo', 'contato', 'qualificado', 'proposta', 'negociacao', 'ganho', 'perdido']),
+  name:      z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  email:     z.string().email('E-mail inválido').or(z.literal('')),
+  phone:     z.string().optional(),
+  company:   z.string().optional(),
+  job_title: z.string().optional(),
+  status:    z.enum(['new', 'contacted', 'qualified', 'unqualified', 'converted']),
 })
 
 type FormData = z.infer<typeof schema>
@@ -44,48 +44,77 @@ interface LeadFormProps {
   lead?: Lead
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSave: (data: LeadFormData) => void
-  onDelete?: (id: string) => void
 }
 
-export function LeadForm({ lead, open, onOpenChange, onSave, onDelete }: LeadFormProps) {
+export function LeadForm({ lead, open, onOpenChange }: LeadFormProps) {
+  const router = useRouter()
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const isEditing = !!lead
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  })
+    formState: { errors },
+  } = useForm<FormData>({ resolver: zodResolver(schema) })
 
   useEffect(() => {
     if (open) {
       reset(
         lead
-          ? { name: lead.name, email: lead.email, phone: lead.phone, company: lead.company, role: lead.role, status: lead.status }
-          : { name: '', email: '', phone: '', company: '', role: '', status: 'novo' }
+          ? {
+              name:      lead.name,
+              email:     lead.email ?? '',
+              phone:     lead.phone ?? '',
+              company:   lead.company ?? '',
+              job_title: lead.job_title ?? '',
+              status:    lead.status,
+            }
+          : { name: '', email: '', phone: '', company: '', job_title: '', status: 'new' }
       )
+      setConfirmDelete(false)
     }
   }, [open, lead, reset])
 
   function handleOpenChange(next: boolean) {
-    if (!next) setConfirmDelete(false)
     onOpenChange(next)
   }
 
   function onSubmit(data: FormData) {
-    onSave({ ...data, id: lead?.id })
-    handleOpenChange(false)
+    startTransition(async () => {
+      if (isEditing && lead) {
+        await updateLead(lead.id, {
+          name:      data.name,
+          email:     data.email || null,
+          phone:     data.phone || null,
+          company:   data.company || null,
+          job_title: data.job_title || null,
+          status:    data.status,
+        })
+      } else {
+        await createLead({
+          name:      data.name,
+          email:     data.email || null,
+          phone:     data.phone || null,
+          company:   data.company || null,
+          job_title: data.job_title || null,
+          status:    data.status,
+        })
+      }
+      router.refresh()
+      handleOpenChange(false)
+    })
   }
 
   function handleDeleteClick() {
-    if (!lead || !onDelete) return
+    if (!lead) return
     if (!confirmDelete) { setConfirmDelete(true); return }
-    onDelete(lead.id)
-    handleOpenChange(false)
+    startTransition(async () => {
+      await deleteLead(lead.id)
+      router.refresh()
+      handleOpenChange(false)
+    })
   }
 
   return (
@@ -109,7 +138,7 @@ export function LeadForm({ lead, open, onOpenChange, onSave, onDelete }: LeadFor
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="lf-email">E-mail *</Label>
+              <Label htmlFor="lf-email">E-mail</Label>
               <Input
                 id="lf-email"
                 type="email"
@@ -122,31 +151,17 @@ export function LeadForm({ lead, open, onOpenChange, onSave, onDelete }: LeadFor
 
             <div className="space-y-1.5">
               <Label htmlFor="lf-phone">Telefone</Label>
-              <Input
-                id="lf-phone"
-                placeholder="(11) 99999-0000"
-                {...register('phone')}
-              />
+              <Input id="lf-phone" placeholder="(11) 99999-0000" {...register('phone')} />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="lf-company">Empresa *</Label>
-              <Input
-                id="lf-company"
-                placeholder="Nome da empresa"
-                aria-invalid={!!errors.company}
-                {...register('company')}
-              />
-              {errors.company && <p className="text-xs text-destructive">{errors.company.message}</p>}
+              <Label htmlFor="lf-company">Empresa</Label>
+              <Input id="lf-company" placeholder="Nome da empresa" {...register('company')} />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="lf-role">Cargo</Label>
-              <Input
-                id="lf-role"
-                placeholder="Ex: Diretor Comercial"
-                {...register('role')}
-              />
+              <Label htmlFor="lf-job_title">Cargo</Label>
+              <Input id="lf-job_title" placeholder="Ex: Diretor Comercial" {...register('job_title')} />
             </div>
 
             <div className="col-span-2 space-y-1.5">
@@ -166,12 +181,13 @@ export function LeadForm({ lead, open, onOpenChange, onSave, onDelete }: LeadFor
           </div>
 
           <div className={`flex items-center gap-2 border-t pt-4 ${isEditing ? 'justify-between' : 'justify-end'}`}>
-            {isEditing && onDelete && (
+            {isEditing && (
               <Button
                 type="button"
                 variant="destructive"
                 size="sm"
                 onClick={handleDeleteClick}
+                disabled={isPending}
               >
                 {confirmDelete ? 'Confirmar exclusão' : 'Excluir Lead'}
               </Button>
@@ -180,7 +196,7 @@ export function LeadForm({ lead, open, onOpenChange, onSave, onDelete }: LeadFor
               <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isPending}>
                 {isEditing ? 'Salvar' : 'Criar Lead'}
               </Button>
             </div>
