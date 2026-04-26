@@ -28,6 +28,7 @@ export interface Database {
     Tables: {
       // -----------------------------------------------------------------------
       workspaces: {
+        Relationships: []
         Row: {
           id:                      string
           name:                    string
@@ -63,6 +64,7 @@ export interface Database {
       }
       // -----------------------------------------------------------------------
       workspace_members: {
+        Relationships: []
         Row: {
           id:           string
           workspace_id: string
@@ -83,6 +85,7 @@ export interface Database {
       }
       // -----------------------------------------------------------------------
       leads: {
+        Relationships: []
         Row: {
           id:           string
           workspace_id: string
@@ -122,6 +125,7 @@ export interface Database {
       }
       // -----------------------------------------------------------------------
       deals: {
+        Relationships: []
         Row: {
           id:           string
           workspace_id: string
@@ -158,6 +162,7 @@ export interface Database {
       }
       // -----------------------------------------------------------------------
       activities: {
+        Relationships: []
         Row: {
           id:           string
           workspace_id: string
@@ -180,6 +185,7 @@ export interface Database {
       }
       // -----------------------------------------------------------------------
       invites: {
+        Relationships: []
         Row: {
           id:           string
           workspace_id: string

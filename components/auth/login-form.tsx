@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
 const schema = z.object({
   email: z.string().min(1, 'E-mail obrigatório').email('E-mail inválido'),
@@ -28,11 +29,23 @@ export function LoginForm() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) })
 
-  async function onSubmit() {
+  async function onSubmit(data: FormData) {
     setServerError(null)
-    // Fake delay — será substituído pela autenticação real no M10
-    await new Promise((r) => setTimeout(r, 800))
+    const supabase = getSupabaseBrowserClient()
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    })
+    if (error) {
+      setServerError(
+        error.message === 'Invalid login credentials'
+          ? 'E-mail ou senha inválidos.'
+          : error.message
+      )
+      return
+    }
     router.push('/dashboard')
+    router.refresh()
   }
 
   return (
@@ -46,7 +59,7 @@ export function LoginForm() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
           {serverError && (
-            <p className="rounded-md bg-danger-50 px-3 py-2 text-sm text-danger-600">
+            <p className="rounded-md bg-red-500/10 px-3 py-2 text-sm text-red-400">
               {serverError}
             </p>
           )}

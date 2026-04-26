@@ -11,6 +11,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { SidebarContent } from '@/components/layout/sidebar-content'
+import type { WorkspaceInfo } from '@/components/workspace/workspace-switcher'
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -25,7 +26,19 @@ function usePageTitle() {
   return PAGE_TITLES[segment] ?? 'PipeFlow'
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+interface UserInfo {
+  name: string
+  email: string
+  initials: string
+}
+
+interface AppShellProps {
+  children: React.ReactNode
+  user: UserInfo
+  workspaces: WorkspaceInfo[]
+}
+
+export function AppShell({ children, user, workspaces }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pageTitle = usePageTitle()
 
@@ -33,7 +46,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Desktop sidebar — hidden on mobile */}
       <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
-        <SidebarContent />
+        <SidebarContent user={user} workspaces={workspaces} />
       </aside>
 
       {/* Main area */}
@@ -55,7 +68,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <SheetHeader>
                 <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
               </SheetHeader>
-              <SidebarContent onNavigate={() => setMobileOpen(false)} />
+              <SidebarContent
+                user={user}
+                workspaces={workspaces}
+                onNavigate={() => setMobileOpen(false)}
+              />
             </SheetContent>
           </Sheet>
 

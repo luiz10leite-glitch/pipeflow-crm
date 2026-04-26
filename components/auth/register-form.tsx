@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
 const schema = z
   .object({
@@ -28,6 +29,7 @@ type FormData = z.infer<typeof schema>
 export function RegisterForm() {
   const router = useRouter()
   const [serverError, setServerError] = useState<string | null>(null)
+  const [emailSent, setEmailSent] = useState(false)
 
   const {
     register,
@@ -35,11 +37,45 @@ export function RegisterForm() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) })
 
-  async function onSubmit() {
+  async function onSubmit(data: FormData) {
     setServerError(null)
-    // Fake delay — será substituído pelo Supabase Auth no M10
-    await new Promise((r) => setTimeout(r, 800))
+    const supabase = getSupabaseBrowserClient()
+    const { data: authData, error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: { full_name: data.name },
+      },
+    })
+    if (error) {
+      setServerError(error.message)
+      return
+    }
+    if (!authData.session) {
+      setEmailSent(true)
+      return
+    }
     router.push('/onboarding')
+    router.refresh()
+  }
+
+  if (emailSent) {
+    return (
+      <Card className="border-neutral-800 bg-neutral-900">
+        <CardContent className="pt-6">
+          <div className="flex flex-col items-center gap-3 py-4 text-center">
+            <p className="font-medium text-white">Confirme seu e-mail</p>
+            <p className="text-sm text-neutral-400">
+              Enviamos um link de confirmação. Clique nele para ativar sua conta e
+              continuar o cadastro.
+            </p>
+            <Link href="/login" className="mt-2 text-sm text-brand-400 hover:text-brand-300">
+              Voltar ao login
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -53,7 +89,7 @@ export function RegisterForm() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
           {serverError && (
-            <p className="rounded-md bg-danger-50 px-3 py-2 text-sm text-danger-600">
+            <p className="rounded-md bg-red-500/10 px-3 py-2 text-sm text-red-400">
               {serverError}
             </p>
           )}
