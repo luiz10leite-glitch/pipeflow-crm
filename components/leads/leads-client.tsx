@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Search, LayoutGrid, Table2, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,9 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { LeadStatusBadge, STATUS_CONFIG } from './lead-status-badge'
 import { LeadCard } from './lead-card'
-import { LeadForm, type LeadFormData } from './lead-form'
-import { MOCK_LEADS, MOCK_USER } from '@/lib/mock-data'
-import type { Lead, LeadStatus } from '@/types/lead'
+import { LeadForm } from './lead-form'
+import type { Lead, LeadStatus } from '@/types/supabase'
 
 function getInitials(name: string) {
   return name
@@ -22,7 +21,7 @@ function getInitials(name: string) {
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr + 'T12:00:00').toLocaleDateString('pt-BR', {
+  return new Date(dateStr).toLocaleDateString('pt-BR', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -32,9 +31,13 @@ function formatDate(dateStr: string) {
 type ViewMode = 'table' | 'grid'
 type StatusFilter = LeadStatus | 'todos'
 
-export function LeadsClient() {
+interface LeadsClientProps {
+  initialLeads: Lead[]
+  userName: string
+}
+
+export function LeadsClient({ initialLeads, userName }: LeadsClientProps) {
   const router = useRouter()
-  const [leads, setLeads] = useState<Lead[]>(MOCK_LEADS)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('todos')
   const [view, setView] = useState<ViewMode>('table')
@@ -43,45 +46,15 @@ export function LeadsClient() {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
-    return leads.filter(lead => {
+    return initialLeads.filter(lead => {
       const matchesSearch =
         q === '' ||
         lead.name.toLowerCase().includes(q) ||
-        lead.company.toLowerCase().includes(q)
+        (lead.company ?? '').toLowerCase().includes(q)
       const matchesStatus = statusFilter === 'todos' || lead.status === statusFilter
       return matchesSearch && matchesStatus
     })
-  }, [leads, search, statusFilter])
-
-  function handleSave(data: LeadFormData) {
-    if (data.id) {
-      setLeads(prev =>
-        prev.map(l =>
-          l.id === data.id
-            ? { ...l, name: data.name, email: data.email, phone: data.phone, company: data.company, role: data.role, status: data.status }
-            : l
-        )
-      )
-    } else {
-      const newLead: Lead = {
-        id: Date.now().toString(),
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        company: data.company,
-        role: data.role,
-        status: data.status,
-        owner: MOCK_USER.name,
-        createdAt: new Date().toISOString().split('T')[0],
-        activities: [],
-      }
-      setLeads(prev => [newLead, ...prev])
-    }
-  }
-
-  function handleDelete(id: string) {
-    setLeads(prev => prev.filter(l => l.id !== id))
-  }
+  }, [initialLeads, search, statusFilter])
 
   function handleEdit(lead: Lead) {
     setEditingLead(lead)
@@ -100,12 +73,11 @@ export function LeadsClient() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">Leads</h2>
           <p className="text-sm text-muted-foreground">
-            {leads.length} contato{leads.length !== 1 ? 's' : ''} no workspace
+            {initialLeads.length} contato{initialLeads.length !== 1 ? 's' : ''} no workspace
           </p>
         </div>
         <Button onClick={handleNewLead}>
@@ -114,7 +86,6 @@ export function LeadsClient() {
         </Button>
       </div>
 
-      {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative flex-1 min-w-48 max-w-sm">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
@@ -159,7 +130,6 @@ export function LeadsClient() {
         </div>
       </div>
 
-      {/* Empty state */}
       {filtered.length === 0 && (
         <div className="rounded-xl border border-border py-16 text-center">
           <p className="text-sm font-medium">Nenhum lead encontrado</p>
@@ -171,7 +141,6 @@ export function LeadsClient() {
         </div>
       )}
 
-      {/* Table view */}
       {view === 'table' && filtered.length > 0 && (
         <div className="rounded-xl border border-border overflow-hidden">
           <table className="w-full text-sm">
@@ -199,21 +168,21 @@ export function LeadsClient() {
                       </Avatar>
                       <div className="min-w-0">
                         <p className="font-medium truncate">{lead.name}</p>
-                        <p className="text-xs text-muted-foreground truncate sm:hidden">{lead.company}</p>
+                        <p className="text-xs text-muted-foreground truncate sm:hidden">{lead.company ?? ''}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
-                    {lead.company}
+                    {lead.company ?? '—'}
                   </td>
                   <td className="px-4 py-3">
                     <LeadStatusBadge status={lead.status} />
                   </td>
                   <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
-                    {lead.owner}
+                    {userName}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
-                    {formatDate(lead.createdAt)}
+                    {formatDate(lead.created_at)}
                   </td>
                   <td className="px-4 py-3">
                     <Button
@@ -233,7 +202,6 @@ export function LeadsClient() {
         </div>
       )}
 
-      {/* Grid view */}
       {view === 'grid' && filtered.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map(lead => (
@@ -242,13 +210,10 @@ export function LeadsClient() {
         </div>
       )}
 
-      {/* Form dialog */}
       <LeadForm
         lead={editingLead}
         open={formOpen}
         onOpenChange={handleFormOpenChange}
-        onSave={handleSave}
-        onDelete={handleDelete}
       />
     </div>
   )

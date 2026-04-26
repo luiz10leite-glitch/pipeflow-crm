@@ -1,6 +1,36 @@
+import { redirect } from 'next/navigation'
+import { getSupabaseServerClient } from '@/lib/supabase/server'
 import { KanbanBoard } from '@/components/pipeline/kanban-board'
+import type { DealWithLead } from '@/types/pipeline'
 
-export default function PipelinePage() {
+export default async function PipelinePage() {
+  const supabase = await getSupabaseServerClient()
+
+  const { data: workspace } = await supabase
+    .from('workspaces')
+    .select('id')
+    .limit(1)
+    .single()
+
+  if (!workspace) redirect('/onboarding')
+
+  const [dealsResult, leadsResult, { data: { user } }] = await Promise.all([
+    supabase
+      .from('deals')
+      .select('*, lead:leads(id, name, company)')
+      .eq('workspace_id', workspace.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('leads')
+      .select('id, name, company, job_title')
+      .eq('workspace_id', workspace.id)
+      .order('name'),
+    supabase.auth.getUser(),
+  ])
+
+  const fullName = (user?.user_metadata?.full_name as string | undefined) ?? ''
+  const userName = fullName || user?.email?.split('@')[0] || 'Usuário'
+
   return (
     <div className="space-y-4">
       <div>
@@ -9,7 +39,11 @@ export default function PipelinePage() {
           Arraste os deals entre os estágios para atualizar o pipeline.
         </p>
       </div>
-      <KanbanBoard />
+      <KanbanBoard
+        initialDeals={(dealsResult.data ?? []) as unknown as DealWithLead[]}
+        leads={leadsResult.data ?? []}
+        userName={userName}
+      />
     </div>
   )
 }

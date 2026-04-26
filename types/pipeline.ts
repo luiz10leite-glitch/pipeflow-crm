@@ -1,28 +1,9 @@
-export type DealStage =
-  | 'new_lead'
-  | 'contacted'
-  | 'proposal_sent'
-  | 'negotiation'
-  | 'closed_won'
-  | 'closed_lost'
+// Fonte de verdade: types/supabase.ts (gerado do schema do banco)
+export type { DealStage, Deal, DealInsert, DealUpdate } from './supabase'
 
-export interface Deal {
-  id: string
-  title: string
-  value: number
-  stage: DealStage
-  leadId: string
-  leadName: string
-  responsible: string
-  dueDate: string | null
-  createdAt: string
-}
+import type { Deal } from './supabase'
 
-export interface StageConfig {
-  id: DealStage
-  label: string
-  color: string
-  textColor: string
-  borderColor: string
-  shadowColor: string
+// Tipo estendido com lead joinado — usado nos componentes do Kanban
+export interface DealWithLead extends Deal {
+  lead: { id: string; name: string; company: string | null } | null
 }

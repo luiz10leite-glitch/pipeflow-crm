@@ -224,6 +224,10 @@ export interface Database {
         Args:    { p_workspace_id: string }
         Returns: boolean
       }
+      create_workspace: {
+        Args:    { p_name: string; p_slug: string }
+        Returns: string
+      }
     }
     Enums:     Record<string, never>
     CompositeTypes: Record<string, never>

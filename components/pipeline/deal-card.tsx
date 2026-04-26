@@ -4,12 +4,13 @@ import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { CalendarDays, Building2, GripVertical } from 'lucide-react'
-import type { Deal } from '@/types/pipeline'
-import { STAGE_CONFIG } from '@/lib/mock-data'
+import { STAGE_CONFIG } from '@/lib/constants'
+import type { DealWithLead } from '@/types/pipeline'
 
 interface DealCardProps {
-  deal: Deal
-  onOpenDetail: (deal: Deal) => void
+  deal: DealWithLead
+  userName: string
+  onOpenDetail: (deal: DealWithLead) => void
   isDragOverlay?: boolean
 }
 
@@ -25,26 +26,27 @@ function formatCurrency(value: number) {
   }).format(value)
 }
 
-function getDueUrgency(dueDate: string | null): 'overdue' | 'urgent' | 'soon' | null {
-  if (!dueDate) return null
-  const days = Math.ceil((new Date(dueDate + 'T12:00:00').getTime() - Date.now()) / 86400000)
+function getDueUrgency(due_date: string | null): 'overdue' | 'urgent' | 'soon' | null {
+  if (!due_date) return null
+  const days = Math.ceil((new Date(due_date + 'T12:00:00').getTime() - Date.now()) / 86400000)
   if (days < 0)  return 'overdue'
   if (days <= 3) return 'urgent'
   if (days <= 7) return 'soon'
   return null
 }
 
-function formatDueDate(dueDate: string) {
-  return new Date(dueDate + 'T12:00:00').toLocaleDateString('pt-BR', {
+function formatDueDate(due_date: string) {
+  return new Date(due_date + 'T12:00:00').toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: 'short',
   })
 }
 
-export function DealCard({ deal, onOpenDetail, isDragOverlay = false }: DealCardProps) {
+export function DealCard({ deal, userName, onOpenDetail, isDragOverlay = false }: DealCardProps) {
   const [hovered, setHovered] = useState(false)
   const stage = STAGE_CONFIG[deal.stage]
-  const urgency = getDueUrgency(deal.dueDate)
+  const urgency = getDueUrgency(deal.due_date)
+  const leadName = deal.lead?.name ?? '—'
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: deal.id, data: { deal } })
@@ -80,7 +82,6 @@ export function DealCard({ deal, onOpenDetail, isDragOverlay = false }: DealCard
       onMouseLeave={() => setHovered(false)}
       onClick={() => !isDragging && onOpenDetail(deal)}
     >
-      {/* Subtle top shimmer on hover */}
       {hovered && !isDragging && (
         <div
           className="pointer-events-none absolute inset-x-0 top-0 h-px"
@@ -89,7 +90,6 @@ export function DealCard({ deal, onOpenDetail, isDragOverlay = false }: DealCard
       )}
 
       <div className="p-3">
-        {/* Title row */}
         <div className="flex items-start justify-between gap-2">
           <p className="flex-1 text-[13px] font-medium leading-snug text-foreground line-clamp-2">
             {deal.title}
@@ -104,7 +104,6 @@ export function DealCard({ deal, onOpenDetail, isDragOverlay = false }: DealCard
           </div>
         </div>
 
-        {/* Value — the hero number */}
         <p
           className="mt-2 text-base font-bold tabular-nums tracking-tight"
           style={{ color: hovered ? stage.shadowColor : undefined }}
@@ -112,15 +111,12 @@ export function DealCard({ deal, onOpenDetail, isDragOverlay = false }: DealCard
           {formatCurrency(deal.value)}
         </p>
 
-        {/* Lead */}
         <div className="mt-2 flex items-center gap-1.5 overflow-hidden">
           <Building2 className="h-3 w-3 shrink-0 text-muted-foreground/60" />
-          <span className="truncate text-[11px] text-muted-foreground/80">{deal.leadName}</span>
+          <span className="truncate text-[11px] text-muted-foreground/80">{leadName}</span>
         </div>
 
-        {/* Footer */}
         <div className="mt-2.5 flex items-center justify-between gap-2">
-          {/* Avatar */}
           <div className="flex items-center gap-1.5">
             <div
               className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold"
@@ -130,21 +126,20 @@ export function DealCard({ deal, onOpenDetail, isDragOverlay = false }: DealCard
                 border: `1px solid ${stage.shadowColor}33`,
               }}
             >
-              {getInitials(deal.responsible)}
+              {getInitials(userName)}
             </div>
             <span className="text-[11px] text-muted-foreground/70">
-              {deal.responsible.split(' ')[0]}
+              {userName.split(' ')[0]}
             </span>
           </div>
 
-          {/* Due date */}
-          {deal.dueDate && (
+          {deal.due_date && (
             <span className={[
               'flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium',
               urgency ? urgencyStyle[urgency] : 'bg-muted/60 text-muted-foreground border border-border/60',
             ].join(' ')}>
               <CalendarDays className="h-2.5 w-2.5" />
-              {formatDueDate(deal.dueDate)}
+              {formatDueDate(deal.due_date)}
             </span>
           )}
         </div>
