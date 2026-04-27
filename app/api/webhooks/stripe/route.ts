@@ -1,11 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import type Stripe from 'stripe'
 import { stripe, STRIPE_WEBHOOK_SECRET } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-
-// Webhook precisa do body cru — desabilita o body parser do Next.js
-export const dynamic = 'force-dynamic'
 
 function getAdminClient() {
   return createClient<Database>(
@@ -15,41 +12,13 @@ function getAdminClient() {
   )
 }
 
-async function activatePro(
-  supabase: ReturnType<typeof getAdminClient>,
-  workspaceId: string,
-  customerId: string,
-  subscriptionId: string
-) {
-  await supabase
-    .from('workspaces')
-    .update({
-      plan: 'pro',
-      stripe_customer_id: customerId,
-      stripe_subscription_id: subscriptionId,
-    })
-    .eq('id', workspaceId)
-}
-
-async function deactivatePro(
-  supabase: ReturnType<typeof getAdminClient>,
-  subscriptionId: string
-) {
-  await supabase
-    .from('workspaces')
-    .update({
-      plan: 'free',
-      stripe_subscription_id: null,
-    })
-    .eq('stripe_subscription_id', subscriptionId)
-}
-
-export async function POST(req: NextRequest) {
-  const body = await req.text()
-  const sig = req.headers.get('stripe-signature')
+export async function POST(request: Request) {
+  // Body raw — Stripe rejeita qualquer parser antes de constructEvent
+  const body = await request.text()
+  const sig = request.headers.get('stripe-signature')
 
   if (!sig) {
-    return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing stripe-signature' }, { status: 400 })
   }
 
   let event: Stripe.Event
@@ -68,41 +37,52 @@ export async function POST(req: NextRequest) {
       if (session.mode !== 'subscription') break
 
       const workspaceId = session.metadata?.workspace_id
-      const customerId = session.customer as string
-      const subscriptionId = session.subscription as string
-
       if (!workspaceId) break
 
-      await activatePro(supabase, workspaceId, customerId, subscriptionId)
-      break
-    }
+      await supabase
+        .from('workspaces')
+        .update({
+          plan: 'pro',
+          stripe_customer_id: session.customer as string,
+          stripe_subscription_id: session.subscription as string,
+        })
+        .eq('id', workspaceId)
 
-    case 'customer.subscription.updated': {
-      const sub = event.data.object as Stripe.Subscription
-      const workspaceId = sub.metadata?.workspace_id
-
-      if (!workspaceId) break
-
-      // Sincroniza status: active/trialing = pro, qualquer outro = free
-      const isActive = sub.status === 'active' || sub.status === 'trialing'
-
-      if (isActive) {
-        await activatePro(supabase, workspaceId, sub.customer as string, sub.id)
-      } else {
-        await deactivatePro(supabase, sub.id)
-      }
       break
     }
 
     case 'customer.subscription.deleted': {
       const sub = event.data.object as Stripe.Subscription
-      await deactivatePro(supabase, sub.id)
+      const workspaceId = sub.metadata?.workspace_id
+      if (!workspaceId) break
+
+      await supabase
+        .from('workspaces')
+        .update({
+          plan: 'free',
+          stripe_subscription_id: null,
+        })
+        .eq('id', workspaceId)
+
       break
     }
 
-    default:
-      // Evento não tratado — ignora silenciosamente
+    case 'invoice.payment_failed': {
+      const invoice = event.data.object as Stripe.Invoice
+      // invoice.subscription_details.metadata tem workspace_id quando a sub foi criada com metadata
+      const workspaceId =
+        (invoice as unknown as { subscription_details?: { metadata?: { workspace_id?: string } } })
+          .subscription_details?.metadata?.workspace_id
+
+      if (!workspaceId) break
+
+      // WorkspacePlan só tem 'free' | 'pro' — para bloquear acesso em falha de pagamento,
+      // adicione 'past_due' ao enum no banco e regenere os tipos com supabase gen types.
+      // Por ora apenas loga o evento sem alterar o plano.
+      console.warn('[stripe] invoice.payment_failed workspace:', workspaceId)
+
       break
+    }
   }
 
   return NextResponse.json({ received: true })

@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
+import { getActiveWorkspace } from '@/lib/workspace'
+import { canAddLead } from '@/lib/limits'
 import type { LeadStatus } from '@/types/supabase'
 
 type Client = Awaited<ReturnType<typeof getSupabaseServerClient>>
@@ -57,12 +59,23 @@ export async function createLead(data: {
   company?: string | null
   job_title?: string | null
   status?: LeadStatus
-}) {
+}): Promise<{ error: string } | { id: string; [key: string]: unknown }> {
   const supabase = await getSupabaseServerClient()
-  const [workspaceId, { data: { user } }] = await Promise.all([
-    getWorkspaceId(supabase),
+  const [workspace, { data: { user } }] = await Promise.all([
+    getActiveWorkspace(supabase),
     supabase.auth.getUser(),
   ])
+
+  if (!workspace) return { error: 'Workspace não encontrado.' }
+
+  const { allowed } = await canAddLead(supabase, workspace.id, workspace.plan)
+  if (!allowed) {
+    return {
+      error: 'Limite de 50 leads atingido no plano Free. Faça upgrade para Pro para adicionar mais.',
+    }
+  }
+
+  const workspaceId = workspace.id
 
   const { data: lead, error } = await supabase
     .from('leads')

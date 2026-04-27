@@ -14,7 +14,7 @@ export default function BillingSuccessPage() {
           O plano pode levar alguns segundos para ser refletido.
         </p>
       </div>
-      <Button render={<Link href="/settings?tab=billing" />}>
+      <Button render={<Link href="/settings?tab=billing" />} nativeButton={false}>
         Ver meu plano
       </Button>
     </div>

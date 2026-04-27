@@ -50,6 +50,7 @@ export function LeadForm({ lead, open, onOpenChange }: LeadFormProps) {
   const router = useRouter()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [serverError, setServerError] = useState<string | null>(null)
   const isEditing = !!lead
 
   const {
@@ -78,10 +79,12 @@ export function LeadForm({ lead, open, onOpenChange }: LeadFormProps) {
   }, [open, lead, reset])
 
   function handleOpenChange(next: boolean) {
+    if (!next) setServerError(null)
     onOpenChange(next)
   }
 
   function onSubmit(data: FormData) {
+    setServerError(null)
     startTransition(async () => {
       if (isEditing && lead) {
         await updateLead(lead.id, {
@@ -92,8 +95,10 @@ export function LeadForm({ lead, open, onOpenChange }: LeadFormProps) {
           job_title: data.job_title || null,
           status:    data.status,
         })
+        router.refresh()
+        handleOpenChange(false)
       } else {
-        await createLead({
+        const result = await createLead({
           name:      data.name,
           email:     data.email || null,
           phone:     data.phone || null,
@@ -101,9 +106,13 @@ export function LeadForm({ lead, open, onOpenChange }: LeadFormProps) {
           job_title: data.job_title || null,
           status:    data.status,
         })
+        if ('error' in result && result.error) {
+          setServerError(String(result.error))
+          return
+        }
+        router.refresh()
+        handleOpenChange(false)
       }
-      router.refresh()
-      handleOpenChange(false)
     })
   }
 
@@ -179,6 +188,12 @@ export function LeadForm({ lead, open, onOpenChange }: LeadFormProps) {
               </select>
             </div>
           </div>
+
+          {serverError && (
+            <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {serverError}
+            </p>
+          )}
 
           <div className={`flex items-center gap-2 border-t pt-4 ${isEditing ? 'justify-between' : 'justify-end'}`}>
             {isEditing && (

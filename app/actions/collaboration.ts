@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
 import { getActiveWorkspace } from '@/lib/workspace'
+import { canAddMember } from '@/lib/limits'
 import { resend, buildInviteEmailHtml } from '@/lib/resend'
 
 // ---------------------------------------------------------------------------
@@ -76,18 +77,10 @@ export async function inviteMember(
 
   const workspaceId = workspace.id
 
-  // Limite do plano Free: máximo 2 membros
-  if (workspace.plan === 'free') {
-    const { count } = await supabase
-      .from('workspace_members')
-      .select('*', { count: 'exact', head: true })
-      .eq('workspace_id', workspaceId)
-
-    if ((count ?? 0) >= 2) {
-      return {
-        error:
-          'Plano Free permite no máximo 2 membros. Faça upgrade para Pro para adicionar mais.',
-      }
+  const { allowed } = await canAddMember(supabase, workspaceId, workspace.plan)
+  if (!allowed) {
+    return {
+      error: 'Plano Free permite no máximo 2 membros. Faça upgrade para Pro para adicionar mais.',
     }
   }
 

@@ -2,14 +2,14 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Search, LayoutGrid, Table2, Pencil } from 'lucide-react'
+import { Plus, Search, LayoutGrid, Table2, Pencil, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { LeadStatusBadge, STATUS_CONFIG } from './lead-status-badge'
 import { LeadCard } from './lead-card'
 import { LeadForm } from './lead-form'
-import type { Lead, LeadStatus } from '@/types/supabase'
+import type { Lead, LeadStatus, WorkspacePlan } from '@/types/supabase'
 
 function getInitials(name: string) {
   return name
@@ -34,9 +34,12 @@ type StatusFilter = LeadStatus | 'todos'
 interface LeadsClientProps {
   initialLeads: Lead[]
   userName: string
+  plan: WorkspacePlan
+  leadLimit: number
 }
 
-export function LeadsClient({ initialLeads, userName }: LeadsClientProps) {
+export function LeadsClient({ initialLeads, userName, plan, leadLimit }: LeadsClientProps) {
+  const atLimit = plan === 'free' && initialLeads.length >= leadLimit
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('todos')
@@ -78,12 +81,27 @@ export function LeadsClient({ initialLeads, userName }: LeadsClientProps) {
           <h2 className="text-2xl font-semibold tracking-tight">Leads</h2>
           <p className="text-sm text-muted-foreground">
             {initialLeads.length} contato{initialLeads.length !== 1 ? 's' : ''} no workspace
+            {plan === 'free' && (
+              <span className={atLimit ? 'ml-1 text-destructive font-medium' : 'ml-1'}>
+                ({initialLeads.length}/{leadLimit} no plano Free)
+              </span>
+            )}
           </p>
         </div>
-        <Button onClick={handleNewLead}>
-          <Plus className="size-4" />
-          Novo Lead
-        </Button>
+        {atLimit ? (
+          <a
+            href="/settings?tab=billing"
+            className="inline-flex items-center gap-2 rounded-lg border border-amber-500/50 px-3 py-1.5 text-sm font-medium text-amber-600 transition-colors hover:bg-amber-50 dark:hover:bg-amber-950/20"
+          >
+            <Zap className="size-4" />
+            Limite atingido — Upgrade Pro
+          </a>
+        ) : (
+          <Button onClick={handleNewLead}>
+            <Plus className="size-4" />
+            Novo Lead
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
