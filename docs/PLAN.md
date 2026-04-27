@@ -294,21 +294,24 @@ Interface primeiro, backend depois. Cada milestone é um incremento funcional e 
 
 ## M15 — Monetização
 
-**Branch:** `milestone/15-monetizacao`
+**Branch:** `feat/billing-nextjs`
 **Objetivo:** Fluxo completo de upgrade/downgrade via Stripe.
 
-- [ ] Configurar produto e preço no Stripe (R$ 49/mês, BRL)
-- [ ] `lib/stripe.ts` com cliente Stripe configurado
-- [ ] Server Action `createCheckoutSession`: cria sessão Stripe Checkout e redireciona
-- [ ] Rota `app/api/webhooks/stripe/route.ts`: processar eventos `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
-- [ ] Webhook atualiza campo `plan` no workspace (`free` | `pro`) e `stripe_customer_id`, `stripe_subscription_id`
-- [ ] Server Action `createBillingPortalSession`: abre Customer Portal do Stripe para gerenciar assinatura
-- [ ] Botão "Fazer upgrade" na tab Billing chama `createCheckoutSession`
-- [ ] Botão "Gerenciar assinatura" chama `createBillingPortalSession`
-- [ ] Testar fluxo completo com Stripe CLI (`stripe listen --forward-to localhost:3000/api/webhooks/stripe`)
-- [ ] Página de sucesso pós-checkout `/billing/success`
+- [x] Configurar produto e preço no Stripe (R$ 49/mês, BRL)
+- [x] `lib/stripe.ts` com cliente Stripe configurado
+- [x] Server Action `createCheckoutSession`: cria sessão Stripe Checkout e redireciona
+- [x] Rota `app/api/webhooks/stripe/route.ts`: processar eventos `checkout.session.completed`, `customer.subscription.deleted`, `invoice.payment_failed`
+- [x] Webhook atualiza campo `plan` no workspace (`free` | `pro`) e `stripe_customer_id`, `stripe_subscription_id`
+- [x] Server Action `createBillingPortalSession`: abre Customer Portal do Stripe para gerenciar assinatura
+- [x] Botão "Fazer upgrade" na tab Billing chama `createCheckoutSession`
+- [x] Botão "Gerenciar assinatura" chama `createBillingPortalSession`
+- [x] Testar fluxo completo com Stripe CLI (`stripe listen --forward-to localhost:3000/api/webhooks/stripe`)
+- [x] Página de sucesso pós-checkout `/billing/success`
+- [x] `lib/limits.ts`: `canAddLead()` e `canAddMember()` — limites Free (50 leads, 2 membros)
+- [x] Página dedicada `/settings/billing` com plano atual, comparação Free vs Pro
+- [x] Aviso visual na página de leads ao atingir limite do plano Free
 
-**Commit final:** `feat: monetization — Stripe Checkout, webhooks, Customer Portal, plan activation`
+**Commit final:** `feat: aula 4.2 — webhook Route Handler, limites de plano e página de billing`
 
 ---
 
